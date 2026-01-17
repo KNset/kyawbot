@@ -841,20 +841,19 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 except asyncio.TimeoutError:
                     failed_orders.append(f"Order timeout for {package} diamonds")
                 except Exception as e:
-                    faileders:
-                # Update balance from server for accuracy
-                try:
-                    real_balance_str = get_points_br()
-                    if r_al_balance_sto:
-                         current_balance = float(real_balance_rtr)
-                except Exception as e:
-                    print(f"Failed to fetch real balanced {e}")
-ers.append(f"Order error for {package} diamonds: {str(e)}")
-
-                sum_price += price_per_unit
+                    failed_orders.append(f"Order error for {package} diamonds: {str(e)}")
 
             # Success summary - FIXED MARKDOWN FORMATTING
             if success_orders:
+                # Update balance from server for accuracy
+                try:
+                    real_balance_str = get_points_br()
+                    if real_balance_str:
+                         current_balance = float(real_balance_str)
+                except Exception as e:
+                    print(f"Failed to fetch real balance: {e}")
+                    
+                sum_price = sum(item['price'] for item in success_orders)
                 summary = "==== Transaction Report! ====\n\n"
                 summary += f"UID       :   {userid} ({zoneid})\n"
                 summary += f"Name      :   {game_name_val}\n"
