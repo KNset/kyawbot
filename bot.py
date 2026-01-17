@@ -696,6 +696,7 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         current_balance = row[0] or 0
+        running_balance = current_balance  # Track balance during loop
         args = context.args
         args = [arg.replace("(", "").replace(")", "").strip() for arg in args]
 
@@ -720,21 +721,24 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Send immediate processing message
         processing_msg = await update.message.reply_text("⚡ Processing your order...")
-        success_orders = []
-        failed_orders = []
-        sum_price = 0
+        
         # Process arguments in chunks
         while i + 2 < len(args):
+            success_orders = []
+            failed_orders = []
+            
             userid = clean_text(args[i])
             zoneid = clean_text(args[i + 1])
             diamond_input = clean_text(args[i + 2])
             i += 3
 
-            # Optional count only for WP/TP/Limit/SVP
+            # Optional count for all products (WP/TP/Limit/SVP/Diamonds)
             count = 1
-            if diamond_input.lower() in ['wp', 'tp', 'limit', 'svp'] and i < len(args) and args[i].isdigit():
-                count = int(args[i])
-                i += 1
+            if i < len(args) and args[i].isdigit():
+                possible_count = int(args[i])
+                if possible_count <= 5: # Assume it's a count if <= 5
+                    count = possible_count
+                    i += 1
 
             if count > 5:
                 await processing_msg.edit_text("❌ Max 5 items per order")
@@ -761,16 +765,17 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await processing_msg.edit_text(f"❌ Invalid diamond value: {diamond_input}")
                     continue
 
-                if count != 1:
-                    await processing_msg.edit_text("❌ Count is only allowed for WP or TP")
-                    continue
-
-                diamond_packages = exact_split_diamonds(diamond_count)
-                if not diamond_packages:
+                # diamond_packages = exact_split_diamonds(diamond_count) # Old single count logic
+                
+                base_packages = exact_split_diamonds(diamond_count)
+                if not base_packages:
                     await processing_msg.edit_text(
                         f"❌ Invalid diamond value "
                     )
                     continue
+                
+                # Multiply packages by count
+                diamond_packages = base_packages * count
 
             # Get game name
             try:
@@ -828,7 +833,7 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 if matched_product['id'] == '25':
                     price_per_unit = (price_val - 0.92) * 10.0
 
-                if current_balance < price_per_unit:
+                if running_balance < price_per_unit:
                     failed_orders.append(f"Insufficient balance for {package} diamonds")
                     continue
 
@@ -851,6 +856,7 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             'package': product_name,
                             'price': price_per_unit
                         })
+                        running_balance -= price_per_unit  # Deduct from running balance
                     else:
                         error_detail = order_response.get('message') if isinstance(order_response, dict) else str(order_response)
                         failed_orders.append(f"Order failed for {package} diamonds: {error_detail}")
@@ -862,13 +868,11 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             # Success summary - FIXED MARKDOWN FORMATTING
             if success_orders:
-                # Update balance from server for accuracy (Only for Admin/Owner checking their own balance)
-                # But here we need to DEDUCT from the USER's database balance
-                
+                # Calculate sum for this chunk only
                 sum_price = sum(item['price'] for item in success_orders)
                 
-                # Deduct from current_balance (which was fetched from DB at start)
-                final_balance = current_balance - sum_price
+                # Use running_balance as the final balance (since we deducted incrementally)
+                final_balance = running_balance
 
                 summary = "==== Transaction Report! ====\n\n"
                 summary += f"UID       :   {userid} ({zoneid})\n"
@@ -898,7 +902,7 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     userid,
                     zoneid,
                     ", ".join([o['package'] for o in success_orders]),
-                    sum(o['price'] for o in success_orders),
+                    sum_price,
                     ", ".join([o['order_id'] for o in success_orders]),
                     timestamp,
                     final_balance
@@ -931,11 +935,7 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Check Your Command (eg. userid, zoneid, diamond).")
     finally:
         if conn:
-            if not is_admin:
-                cursor.execute("UPDATE authorized_users SET smilecoin_balance_br = %s WHERE username = %s", (current_balance, username))
-            else:
-                cursor.execute("UPDATE admins SET br_coin = %s WHERE username = %s", (current_balance, username))
-            conn.commit()
+            # Removed incorrect balance reset
             conn.close()
 
 # Update your PH product mapping based on actual product list
@@ -998,6 +998,7 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         current_balance = float(row[0] or 0.0)
+        running_balance = current_balance # Track balance during loop
         args = context.args
         args = [arg.replace("(", "").replace(")", "").strip() for arg in args]
 
@@ -1021,20 +1022,24 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         
 
+        # Process arguments in chunks
         i = 0
-        success_orders = []
-        failed_orders = []
-        sum_price = 0.0
         while i + 2 < len(args):
+            success_orders = []
+            failed_orders = []
+            sum_price = 0.0
+            
             userid = clean_text(args[i])
             zoneid = clean_text(args[i + 1])
             diamond_input = clean_text(args[i + 2])
             i += 3
 
             count = 1
-            if diamond_input.lower() in ['wp', 'gp', 'svp'] and i < len(args) and args[i].isdigit():
-                count = int(args[i])
-                i += 1
+            if i < len(args) and args[i].isdigit():
+                possible_count = int(args[i])
+                if possible_count <= 5: # Assume it's a count if <= 5
+                    count = possible_count
+                    i += 1
 
             if count > 5:
                 await processing_msg.edit_text("❌ Max 5 items per order")
@@ -1061,12 +1066,15 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 is_pass = False
                 try:
                     diamond_count = int(diamond_input)  # Convert to integer
-                    diamond_packages = exact_split_diamonds_ph(diamond_count)
-                    if not diamond_packages:
+                    base_packages = exact_split_diamonds_ph(diamond_count)
+                    if not base_packages:
                         await processing_msg.edit_text(f"❌ Invalid diamond value: {diamond_input}")
                         continue
                     # Use the actual diamond amount for product lookup
-                    product_key = str(diamond_packages[0])
+                    product_key = str(base_packages[0])
+                    
+                    # Multiply packages by count
+                    diamond_packages = base_packages * count
                 except ValueError:
                     await processing_msg.edit_text(f"❌ Invalid diamond value:")
                     continue
@@ -1099,6 +1107,11 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             if product['id'] == actual_product_id:
                                 matched_product = product
                                 break
+                        elif package == 3 and product_key == 'svp':
+                             name = product.get('spu', '')
+                             if "Super" in name and "Value" in name:
+                                 matched_product = product
+                                 break
                     else:
                         # Convert both to same type for comparison
                         product_diamonds = extract_total_diamonds_ph(product['spu'])
@@ -1116,8 +1129,8 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 except (ValueError, TypeError):
                     price_per_unit = 0.0
 
-                if current_balance < price_per_unit:
-                    failed_orders.append(f"Insufficient balance for {package} diamonds (need {price_per_unit}, have {current_balance})")
+                if running_balance < price_per_unit:
+                    failed_orders.append(f"Insufficient balance for {package} diamonds (need {price_per_unit}, have {running_balance})")
                     continue
 
                 timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
@@ -1139,6 +1152,7 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             'package': product_name,
                             'price': price_per_unit
                         })
+                        running_balance -= price_per_unit  # Deduct from running balance
                         print(f"✅ PH Order successful: {order_response.get('SN')}")
                     else:
                         error_detail = order_response.get('message', 'Unknown error')
@@ -1161,8 +1175,8 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 
                 # sum_price is already calculated in the loop
                 
-                # Deduct from current_balance (which was fetched from DB at start)
-                final_balance = current_balance - sum_price
+                # Use running_balance as final balance (since we deducted incrementally)
+                final_balance = running_balance
 
                 summary = "==== Transaction Report! ====\n\n"
                 summary += f"UID       :   {userid} ({zoneid})\n"
