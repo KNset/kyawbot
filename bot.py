@@ -395,6 +395,8 @@ async def show_products_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
         for name, price in special_packs.items():
             if "Limited" in name and "Value" in name:
                 message_lines.append(f" 💎 {name} -(🪙{price:.2f})\n")
+            if "Super" in name and "Value" in name:
+                message_lines.append(f" 💎 {name} -(🪙{price:.2f})\n")
 
         message_lines.append(" First Recharge")
         first_recharge = [55, 165, 275, 565]
@@ -425,6 +427,15 @@ async def show_products_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                  if 'Weekly Diamond Pass' in k:
                      wp_price = v
                      break
+        
+        # Check for Super Value Pack if not found above
+        svp_price = None
+        for k, v in special_packs.items():
+             if "Super" in k and "Value" in k:
+                 svp_price = v
+                 break
+        if svp_price:
+             message_lines.append(f" 💎 Super Value Pack -(🪙{svp_price:.2f})\n")
 
         if wp_price:
             for i in range(1, 6):
@@ -702,9 +713,9 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
             diamond_input = clean_text(args[i + 2])
             i += 3
 
-            # Optional count only for WP/TP/Limit
+            # Optional count only for WP/TP/Limit/SVP
             count = 1
-            if diamond_input.lower() in ['wp', 'tp', 'limit'] and i < len(args) and args[i].isdigit():
+            if diamond_input.lower() in ['wp', 'tp', 'limit', 'svp'] and i < len(args) and args[i].isdigit():
                 count = int(args[i])
                 i += 1
 
@@ -721,6 +732,9 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 is_pass = True
             elif diamond_input.lower() == 'limit':
                 diamond_packages = [3] * count
+                is_pass = True
+            elif diamond_input.lower() == 'svp':
+                diamond_packages = [4] * count
                 is_pass = True
             else:
                 is_pass = False
@@ -767,6 +781,11 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         if package == 3:
                             name = translate_name(product.get('spu', 'Unnamed'))
                             if "Limited" in name and "Value" in name:
+                                matched_product = product
+                                break
+                        if package == 4:
+                            name = translate_name(product.get('spu', 'Unnamed'))
+                            if "Super" in name and "Value" in name:
                                 matched_product = product
                                 break
                     else:
@@ -822,7 +841,15 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 except asyncio.TimeoutError:
                     failed_orders.append(f"Order timeout for {package} diamonds")
                 except Exception as e:
-                    failed_orders.append(f"Order error for {package} diamonds: {str(e)}")
+                    faileders:
+                # Update balance from server for accuracy
+                try:
+                    real_balance_str = get_points_br()
+                    if r_al_balance_sto:
+                         current_balance = float(real_balance_rtr)
+                except Exception as e:
+                    print(f"Failed to fetch real balanced {e}")
+ers.append(f"Order error for {package} diamonds: {str(e)}")
 
                 sum_price += price_per_unit
 
@@ -982,7 +1009,7 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
             i += 3
 
             count = 1
-            if diamond_input.lower() in ['wp', 'gp'] and i < len(args) and args[i].isdigit():
+            if diamond_input.lower() in ['wp', 'gp', 'svp'] and i < len(args) and args[i].isdigit():
                 count = int(args[i])
                 i += 1
 
@@ -1003,6 +1030,10 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 diamond_packages = [2] * count
                 is_pass = True
                 product_key = 'gp'
+            elif diamond_input.lower() == 'svp':
+                diamond_packages = [3] * count
+                is_pass = True
+                product_key = 'svp'
             else:
                 is_pass = False
                 try:
@@ -1019,7 +1050,7 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             # Get actual product ID from mapping
             actual_product_id = ph_mapping.get(product_key)
-            if not actual_product_id:
+            if not actual_product_id and product_key != 'svp': # svp might not be in mapping yet, will search dynamically
                 await processing_msg.edit_text(f"❌ No product found for {diamond_input} (key: {product_key})")
                 continue
 
