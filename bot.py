@@ -194,12 +194,27 @@ def generate_signature_ph(data: dict, key: str) -> str:
 import aiohttp
 import time
 
+def load_cookies_from_file():
+    try:
+        with open("cookies.txt", "r", encoding="utf-8") as f:
+            cookie_string = f.read().strip()
+        
+        cookies = {}
+        if cookie_string:
+            for item in cookie_string.split(";"):
+                item = item.strip()
+                if "=" in item:
+                    key, value = item.split("=", 1)
+                    cookies[key] = value
+        return cookies
+    except FileNotFoundError:
+        print("[ERROR] No cookies.txt found!")
+        return {}
+
 def get_points_br():
     url = "https://www.smile.one/customer/order"
-    cookies = {
-        "PHPSESSID": "mmres80rfmjpkg9k2pbk7pcjcm"
-    }
-
+    cookies = load_cookies_from_file()
+    
     headers = {
         "User-Agent": "Mozilla/5.0"
     }
@@ -210,16 +225,16 @@ def get_points_br():
 
     # Find the balance container
     balance_div = soup.find("div", class_="balance-coins")
-    print(balance_div)
+    if not balance_div:
+        return None
+    # print(balance_div)
     balance_value = balance_div.find_all("p")[1].get_text(strip=True)
     return balance_value
 
 
 def get_points_ph():
     url = "https://www.smile.one/ph/customer/order"
-    cookies = {
-        "PHPSESSID": "mmres80rfmjpkg9k2pbk7pcjcm"
-    }
+    cookies = load_cookies_from_file()
 
     headers = {
         "User-Agent": "Mozilla/5.0"
@@ -231,6 +246,8 @@ def get_points_ph():
 
     # Find the balance container
     balance_div = soup.find("div", class_="balance-coins")
+    if not balance_div:
+        return None
     balance_value = balance_div.find_all("p")[1].get_text(strip=True)
     return balance_value
 
@@ -828,7 +845,7 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         else:
                             success = False
                     if success:
-                        current_balance -= price_per_unit
+                        
                         success_orders.append({
                             'order_id': generate_sn(),
                             'package': product_name,
@@ -845,15 +862,14 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             # Success summary - FIXED MARKDOWN FORMATTING
             if success_orders:
-                # Update balance from server for accuracy
-                try:
-                    real_balance_str = get_points_br()
-                    if real_balance_str:
-                         current_balance = float(real_balance_str)
-                except Exception as e:
-                    print(f"Failed to fetch real balance: {e}")
-                    
+                # Update balance from server for accuracy (Only for Admin/Owner checking their own balance)
+                # But here we need to DEDUCT from the USER's database balance
+                
                 sum_price = sum(item['price'] for item in success_orders)
+                
+                # Deduct from current_balance (which was fetched from DB at start)
+                final_balance = current_balance - sum_price
+
                 summary = "==== Transaction Report! ====\n\n"
                 summary += f"UID       :   {userid} ({zoneid})\n"
                 summary += f"Name      :   {game_name_val}\n"
@@ -864,7 +880,7 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 summary += f"Time      :   {timestamp}\n"
                 summary += f"==== {username} ====\n"
                 summary += f"Amount    :   {sum_price:.2f} 🪙\n"
-                summary += f"Assets    :   {current_balance:.2f} 🪙\n"
+                summary += f"Assets    :   {final_balance:.2f} 🪙\n"
 
                 await update.message.reply_text(summary)
 
@@ -885,8 +901,16 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     sum(o['price'] for o in success_orders),
                     ", ".join([o['order_id'] for o in success_orders]),
                     timestamp,
-                    current_balance
+                    final_balance
                 ))
+            
+            # Commit changes immediately after successful order processing
+            if conn:
+                if not is_admin:
+                    cursor.execute("UPDATE authorized_users SET smilecoin_balance_br = %s WHERE username = %s", (final_balance, username))
+                else:
+                    cursor.execute("UPDATE admins SET br_coin = %s WHERE username = %s", (final_balance, username))
+                conn.commit()
 
             # Failed summary
             if failed_orders:
@@ -1109,7 +1133,7 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         else:
                             success = False
                     if success:
-                        current_balance -= price_per_unit
+                        
                         success_orders.append({
                             'order_id': generate_sn(),
                             'package': product_name,
@@ -1132,6 +1156,14 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             # Success summary
             if success_orders:
+                # Update balance from server for accuracy (Only for Admin/Owner checking their own balance)
+                # But here we need to DEDUCT from the USER's database balance
+                
+                # sum_price is already calculated in the loop
+                
+                # Deduct from current_balance (which was fetched from DB at start)
+                final_balance = current_balance - sum_price
+
                 summary = "==== Transaction Report! ====\n\n"
                 summary += f"UID       :   {userid} ({zoneid})\n"
                 summary += f"Name      :   {game_name_val}\n"
@@ -1142,7 +1174,7 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 summary += f"Time      :   {timestamp}\n"
                 summary += f"==== {username} ====\n"
                 summary += f"Amount    :   {sum_price:.2f} 🪙\n"
-                summary += f"Assets    :   {current_balance:.2f} 🪙\n"
+                summary += f"Assets    :   {final_balance:.2f} 🪙\n"
 
 
                 
@@ -1160,8 +1192,16 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     ", ".join([o['package'] for o in success_orders]),
                     float(sum_price),
                     ", ".join([o['order_id'] for o in success_orders]),
-                    timestamp, float(current_balance)
+                    timestamp, float(final_balance)
                 ))
+            
+            # Commit changes immediately after successful order processing
+            if conn:
+                if not is_admin:
+                    cursor.execute("UPDATE authorized_users SET smilecoin_balance_ph = %s WHERE username = %s", (float(final_balance), username))
+                else:
+                    cursor.execute("UPDATE admins SET ph_coin = %s WHERE username = %s", (float(final_balance), username))
+                conn.commit()
 
             # Failed summary
             if failed_orders:
@@ -1181,16 +1221,7 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ System error, please try again.")
     finally:
         if conn:
-            try:
-                if not is_admin:
-                    cursor.execute("UPDATE authorized_users SET smilecoin_balance_ph = %s WHERE username = %s", (float(current_balance), username))
-                else:
-                    cursor.execute("UPDATE admins SET ph_coin = %s WHERE username = %s", (float(current_balance), username))
-                conn.commit()
-            except Exception as e:
-                print(f"❌ Error updating balance: {e}")
-            finally:
-                conn.close()
+            conn.close()
 
 
 

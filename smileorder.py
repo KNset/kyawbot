@@ -127,12 +127,20 @@ class SmileOneOrder:
             "-d", f"user_id={user_id}&zone_id={zone_id}&pid={product_id}&checkrole=&pay_methond=smilecoin&channel_method=smilecoin"
         ]
 
-        result = subprocess.run(curl_cmd, capture_output=True, text=True)
+        result = subprocess.run(curl_cmd, capture_output=True, encoding='utf-8', errors='replace', text=True)
         response_text = result.stdout
         print("Step 3 Query Response:", response_text)
 
         try:
-            json_data = json.loads(response_text)
+            # Sometimes curl output might contain headers or other info if not silent
+            # Try to find the JSON object part
+            if "{" in response_text:
+                json_start = response_text.find("{")
+                json_end = response_text.rfind("}") + 1
+                json_str = response_text[json_start:json_end]
+                json_data = json.loads(json_str)
+            else:
+                json_data = json.loads(response_text)
         except Exception:
             return {
                 "code": result.returncode,
