@@ -79,7 +79,7 @@ def create_admin():
 def is_authorized(username):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT 1 FROM authorized_users WHERE username = %s", (username,))
+    cursor.execute("SELECT 1 FROM authorized_users WHERE LOWER(username) = LOWER(%s)", (username,))
     result = cursor.fetchone()
     conn.close()
     return result is not None
@@ -120,7 +120,7 @@ def list_admin_id(username):
     conn = get_connection()
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT admin_id FROM admins WHERE username = %s", (username,))
+        cursor.execute("SELECT admin_id FROM admins WHERE LOWER(username) = LOWER(%s)", (username,))
         ids = [row[0] for row in cursor.fetchall()]
         if ids:
             return True

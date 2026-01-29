@@ -687,9 +687,9 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         # Get balance
         if not is_admin:
-            cursor.execute("SELECT smilecoin_balance_br FROM authorized_users WHERE username = %s", (username,))
+            cursor.execute("SELECT smilecoin_balance_br FROM authorized_users WHERE LOWER(username) = LOWER(%s)", (username,))
         else:
-            cursor.execute("SELECT br_coin FROM admins WHERE username = %s", (username,))
+            cursor.execute("SELECT br_coin FROM admins WHERE LOWER(username) = LOWER(%s)", (username,))
         row = cursor.fetchone()
         if not row:
             await update.message.reply_text(f"❌ User @{username} not found in database.")
@@ -757,6 +757,12 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
             elif diamond_input.lower() == 'svp':
                 diamond_packages = [4] * count
                 is_pass = True
+            elif diamond_input.lower() == 'web':
+                diamond_packages = [5] * count
+                is_pass = True
+            elif diamond_input.lower() == 'meb':
+                diamond_packages = [6] * count
+                is_pass = True
             else:
                 is_pass = False
                 try:
@@ -810,6 +816,16 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             if "Super" in name and "Value" in name:
                                 matched_product = product
                                 break
+                        if package == 5:
+                            name = translate_name(product.get('spu', 'Unnamed'))
+                            if "Weekly" in name and "Elite" in name:
+                                matched_product = product
+                                break
+                        if package == 6:
+                            name = translate_name(product.get('spu', 'Unnamed'))
+                            if "Monthly" in name and "Epic" in name:
+                                matched_product = product
+                                break
                     else:
                         if extract_total_diamonds_br(product['spu']) == package:
                             matched_product = product
@@ -838,7 +854,7 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     continue
 
                 timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-                product_name = "Wp" if package == 1 else "Twilight Pass" if package == 2 else "Limited Value Pack" if package == 3 else f"{package}"
+                product_name = "Wp" if package == 1 else "Twilight Pass" if package == 2 else "Limited Value Pack" if package == 3 else "Super Value Pack" if package == 4 else "Weekly Elite Bundle" if package == 5 else "Monthly Epic Bundle" if package == 6 else f"{package}"
 
                 # Make the recharge order
                 try:
@@ -911,9 +927,9 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # Commit changes immediately after successful order processing
             if conn:
                 if not is_admin:
-                    cursor.execute("UPDATE authorized_users SET smilecoin_balance_br = %s WHERE username = %s", (final_balance, username))
+                    cursor.execute("UPDATE authorized_users SET smilecoin_balance_br = %s WHERE LOWER(username) = LOWER(%s)", (final_balance, username))
                 else:
-                    cursor.execute("UPDATE admins SET br_coin = %s WHERE username = %s", (final_balance, username))
+                    cursor.execute("UPDATE admins SET br_coin = %s WHERE LOWER(username) = LOWER(%s)", (final_balance, username))
                 conn.commit()
 
             # Failed summary
@@ -989,9 +1005,9 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         # Get balance - ensure float
         if not is_admin:
-            cursor.execute("SELECT smilecoin_balance_ph FROM authorized_users WHERE username = %s", (username,))
+            cursor.execute("SELECT smilecoin_balance_ph FROM authorized_users WHERE LOWER(username) = LOWER(%s)", (username,))
         else:
-            cursor.execute("SELECT ph_coin FROM admins WHERE username = %s", (username,))
+            cursor.execute("SELECT ph_coin FROM admins WHERE LOWER(username) = LOWER(%s)", (username,))
         row = cursor.fetchone()
         if not row:
             await update.message.reply_text(f"❌ User @{username} not found in database.")
@@ -1079,12 +1095,6 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await processing_msg.edit_text(f"❌ Invalid diamond value:")
                     continue
 
-            # Get actual product ID from mapping
-            actual_product_id = ph_mapping.get(product_key)
-            if not actual_product_id and product_key != 'svp': # svp might not be in mapping yet, will search dynamically
-                await processing_msg.edit_text(f"❌ No product found for {diamond_input} (key: {product_key})")
-                continue
-
             # Get game name
             try:
                 game_name_val = clean_text(gamename(userid, zoneid))
@@ -1095,10 +1105,16 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await processing_msg.edit_text(f"❌ API Error for user {userid} zone {zoneid}")
                 continue
 
-
-
             # Process each package
             for package in diamond_packages:
+                # Get actual product ID from mapping for this package
+                current_product_key = str(package) if not is_pass else product_key
+                actual_product_id = ph_mapping.get(current_product_key)
+                
+                if not actual_product_id and product_key != 'svp': 
+                    failed_orders.append(f"No product found for {package} diamonds (key: {current_product_key})")
+                    continue
+
                 # Find the product for this package
                 matched_product = None
                 for product in response['data']['product']:
@@ -1212,9 +1228,9 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # Commit changes immediately after successful order processing
             if conn:
                 if not is_admin:
-                    cursor.execute("UPDATE authorized_users SET smilecoin_balance_ph = %s WHERE username = %s", (float(final_balance), username))
+                    cursor.execute("UPDATE authorized_users SET smilecoin_balance_ph = %s WHERE LOWER(username) = LOWER(%s)", (float(final_balance), username))
                 else:
-                    cursor.execute("UPDATE admins SET ph_coin = %s WHERE username = %s", (float(final_balance), username))
+                    cursor.execute("UPDATE admins SET ph_coin = %s WHERE LOWER(username) = LOWER(%s)", (float(final_balance), username))
                 conn.commit()
 
             # Failed summary
@@ -1414,17 +1430,21 @@ async def check_balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin = None
 
     try:
-        cursor.execute("SELECT username, br_coin, ph_coin FROM admins WHERE admin_id =%s",(adminid,))
+        cursor.execute("SELECT username, br_coin, ph_coin FROM admins WHERE LOWER(admin_id) = LOWER(%s)",(adminid,))
         admincoin = cursor.fetchone()
-        admin, brcoin, phcoin = admincoin
+        if admincoin:
+            admin, brcoin, phcoin = admincoin
+        else:
+            admin = None
     except Exception as e:
         print("This is form check balance : ", e)
+        admin = None
 
-    if (admin == username):
+    if (admin and admin.lower() == (username or "").lower()):
         conn.close()
         await update.message.reply_text(f"💰 Your Smile Coin balance:\n\n BR : {brcoin:.2f}\nPH : {phcoin:.2f}")
     else:
-        cursor.execute("SELECT smilecoin_balance_br,smilecoin_balance_ph FROM authorized_users WHERE username = %s", (username,))
+        cursor.execute("SELECT smilecoin_balance_br,smilecoin_balance_ph FROM authorized_users WHERE LOWER(username) = LOWER(%s)", (username,))
         row = cursor.fetchone()
         conn.close()
 
@@ -1444,7 +1464,7 @@ async def admin_check_balance(update: Update, context: ContextTypes.DEFAULT_TYPE
         if username in users:
             conn = get_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT smilecoin_balance_br,smilecoin_balance_ph FROM authorized_users WHERE username = %s", (username,))
+            cursor.execute("SELECT smilecoin_balance_br,smilecoin_balance_ph FROM authorized_users WHERE LOWER(username) = LOWER(%s)", (username,))
             row = cursor.fetchone()
             conn.close()
 
@@ -1477,7 +1497,7 @@ async def add_smilecoin_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT smilecoin_balance_br, telegram_id FROM authorized_users WHERE username = %s", (username,))
+        cursor.execute("SELECT smilecoin_balance_br, telegram_id FROM authorized_users WHERE LOWER(username) = LOWER(%s)", (username,))
         row = cursor.fetchone()
 
         if not row:
@@ -1487,7 +1507,7 @@ async def add_smilecoin_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         current_balance, telegram_id = row
         new_balance = current_balance + amount
-        cursor.execute("UPDATE authorized_users SET smilecoin_balance_br = %s WHERE username = %s", (new_balance, username))
+        cursor.execute("UPDATE authorized_users SET smilecoin_balance_br = %s WHERE LOWER(username) = LOWER(%s)", (new_balance, username))
         conn.commit()
         conn.close()
 
@@ -1518,7 +1538,7 @@ async def add_smilecoin_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         if(brcoin[0] > amount) :
-            cursor.execute("SELECT smilecoin_balance_br, telegram_id FROM authorized_users WHERE username = %s", (username,))
+            cursor.execute("SELECT smilecoin_balance_br, telegram_id FROM authorized_users WHERE LOWER(username) = LOWER(%s)", (username,))
             row = cursor.fetchone()
 
             if not row:
@@ -1528,7 +1548,7 @@ async def add_smilecoin_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 current_balance, telegram_id = row
                 new_balance = current_balance + amount
-                cursor.execute("UPDATE authorized_users SET smilecoin_balance_br = %s WHERE username = %s", (new_balance, username))
+                cursor.execute("UPDATE authorized_users SET smilecoin_balance_br = %s WHERE LOWER(username) = LOWER(%s)", (new_balance, username))
                 conn.commit()
 
                 await update.message.reply_text(f"✅ Added {amount} Smile Coin to @{username}. New balance: {new_balance}")
@@ -1573,7 +1593,7 @@ async def add_smilecoin_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT smilecoin_balance_ph, telegram_id FROM authorized_users WHERE username = %s", (username,))
+        cursor.execute("SELECT smilecoin_balance_ph, telegram_id FROM authorized_users WHERE LOWER(username) = LOWER(%s)", (username,))
         row = cursor.fetchone()
 
         if not row:
@@ -1583,7 +1603,7 @@ async def add_smilecoin_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         current_balance, telegram_id = row
         new_balance = current_balance + amount
-        cursor.execute("UPDATE authorized_users SET smilecoin_balance_ph = %s WHERE username = %s", (new_balance, username))
+        cursor.execute("UPDATE authorized_users SET smilecoin_balance_ph = %s WHERE LOWER(username) = LOWER(%s)", (new_balance, username))
         conn.commit()
         conn.close()
 
@@ -1614,7 +1634,7 @@ async def add_smilecoin_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         if(phcoin[0] > amount) :
-            cursor.execute("SELECT smilecoin_balance_ph, telegram_id FROM authorized_users WHERE username = %s", (username,))
+            cursor.execute("SELECT smilecoin_balance_ph, telegram_id FROM authorized_users WHERE LOWER(username) = LOWER(%s)", (username,))
             row = cursor.fetchone()
 
             if not row:
@@ -1624,7 +1644,7 @@ async def add_smilecoin_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 current_balance, telegram_id = row
                 new_balance = current_balance + amount
-                cursor.execute("UPDATE authorized_users SET smilecoin_balance_ph = %s WHERE username = %s", (new_balance, username))
+                cursor.execute("UPDATE authorized_users SET smilecoin_balance_ph = %s WHERE LOWER(username) = LOWER(%s)", (new_balance, username))
                 conn.commit()
 
                 await update.message.reply_text(f"✅ Added {amount} Smile Coin to @{username}. New balance: {new_balance}")
@@ -1670,7 +1690,7 @@ async def add_admin_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT ph_coin, admin_id FROM admins WHERE username = %s", (username,))
+        cursor.execute("SELECT ph_coin, admin_id FROM admins WHERE LOWER(username) = LOWER(%s)", (username,))
         row = cursor.fetchone()
 
         if not row:
@@ -1680,7 +1700,7 @@ async def add_admin_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         current_balance, telegram_id = row
         new_balance = current_balance + amount
-        cursor.execute("UPDATE admins SET ph_coin = %s WHERE username = %s", (new_balance, username))
+        cursor.execute("UPDATE admins SET ph_coin = %s WHERE LOWER(username) = LOWER(%s)", (new_balance, username))
         conn.commit()
         conn.close()
 
@@ -1718,7 +1738,7 @@ async def add_admin_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT br_coin, admin_id FROM admins WHERE username = %s", (username,))
+        cursor.execute("SELECT br_coin, admin_id FROM admins WHERE LOWER(username) = LOWER(%s)", (username,))
         row = cursor.fetchone()
 
         if not row:
@@ -1728,7 +1748,7 @@ async def add_admin_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         current_balance, telegram_id = row
         new_balance = current_balance + amount
-        cursor.execute("UPDATE admins SET br_coin = %s WHERE username = %s", (new_balance, username))
+        cursor.execute("UPDATE admins SET br_coin = %s WHERE LOWER(username) = LOWER(%s)", (new_balance, username))
         conn.commit()
         conn.close()
 
