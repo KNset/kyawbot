@@ -165,8 +165,9 @@ def restricted_to_pro_users(func):
     @wraps(func)
     async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         username = update.effective_user.username
-        if not is_authorized(username) and not list_admin_id(username):
-            print(list_admin_id(username))
+        user_id = str(update.effective_user.id)
+        if not is_authorized(username) and not list_admin_id(username) and not list_admin_id(user_id):
+            print(f"Access denied for user {username} (ID: {user_id})")
             if update.message:
                 await update.message.reply_text(" 🚫 Contact to owner of your group Thank you very much for your interest")
             elif update.callback_query:
@@ -447,12 +448,22 @@ async def show_products_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         # Check for Super Value Pack if not found above
         svp_price = None
+        web_price = None
+        meb_price = None
         for k, v in special_packs.items():
              if "Super" in k and "Value" in k:
                  svp_price = v
-                 break
+             elif "Weekly" in k and "Elite" in k:
+                 web_price = v
+             elif "Monthly" in k and "Epic" in k:
+                 meb_price = v
+
         if svp_price:
              message_lines.append(f" 💎 Super Value Pack -(🪙{svp_price:.2f})\n")
+        if web_price:
+             message_lines.append(f" 💎 Weekly Elite Bundle -(🪙{web_price:.2f})\n")
+        if meb_price:
+             message_lines.append(f" 💎 Monthly Epic Bundle -(🪙{meb_price:.2f})\n")
 
         if wp_price:
             for i in range(1, 6):
@@ -682,14 +693,18 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     conn = get_connection()
     cursor = conn.cursor()
-    is_admin = bool(list_admin_id(username))
+    is_admin = bool(list_admin_id(username) or list_admin_id(user_id))
 
     try:
         # Get balance
         if not is_admin:
             cursor.execute("SELECT smilecoin_balance_br FROM authorized_users WHERE LOWER(username) = LOWER(%s)", (username,))
         else:
-            cursor.execute("SELECT br_coin FROM admins WHERE LOWER(username) = LOWER(%s)", (username,))
+            cursor.execute("""
+                SELECT br_coin FROM admins 
+                WHERE (LOWER(username) = LOWER(%s) AND username IS NOT NULL AND username != '') 
+                OR admin_id = %s
+            """, (username, str(user_id)))
         row = cursor.fetchone()
         if not row:
             await update.message.reply_text(f"❌ User @{username} not found in database.")
@@ -924,13 +939,17 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     final_balance
                 ))
             
-            # Commit changes immediately after successful order processing
-            if conn:
-                if not is_admin:
-                    cursor.execute("UPDATE authorized_users SET smilecoin_balance_br = %s WHERE LOWER(username) = LOWER(%s)", (final_balance, username))
-                else:
-                    cursor.execute("UPDATE admins SET br_coin = %s WHERE LOWER(username) = LOWER(%s)", (final_balance, username))
-                conn.commit()
+                # Commit changes immediately after successful order processing
+                if conn:
+                    if not is_admin:
+                        cursor.execute("UPDATE authorized_users SET smilecoin_balance_br = %s WHERE LOWER(username) = LOWER(%s)", (final_balance, username))
+                    else:
+                        cursor.execute("""
+                            UPDATE admins SET br_coin = %s 
+                            WHERE (LOWER(username) = LOWER(%s) AND username IS NOT NULL AND username != '') 
+                            OR admin_id = %s
+                        """, (final_balance, username, str(user_id)))
+                    conn.commit()
 
             # Failed summary
             if failed_orders:
@@ -1000,14 +1019,18 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     conn = get_connection()
     cursor = conn.cursor()
-    is_admin = bool(list_admin_id(username))
+    is_admin = bool(list_admin_id(username) or list_admin_id(user_id))
 
     try:
         # Get balance - ensure float
         if not is_admin:
             cursor.execute("SELECT smilecoin_balance_ph FROM authorized_users WHERE LOWER(username) = LOWER(%s)", (username,))
         else:
-            cursor.execute("SELECT ph_coin FROM admins WHERE LOWER(username) = LOWER(%s)", (username,))
+            cursor.execute("""
+                SELECT ph_coin FROM admins 
+                WHERE (LOWER(username) = LOWER(%s) AND username IS NOT NULL AND username != '') 
+                OR admin_id = %s
+            """, (username, str(user_id)))
         row = cursor.fetchone()
         if not row:
             await update.message.reply_text(f"❌ User @{username} not found in database.")
@@ -1225,13 +1248,17 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     timestamp, float(final_balance)
                 ))
             
-            # Commit changes immediately after successful order processing
-            if conn:
-                if not is_admin:
-                    cursor.execute("UPDATE authorized_users SET smilecoin_balance_ph = %s WHERE LOWER(username) = LOWER(%s)", (float(final_balance), username))
-                else:
-                    cursor.execute("UPDATE admins SET ph_coin = %s WHERE LOWER(username) = LOWER(%s)", (float(final_balance), username))
-                conn.commit()
+                # Commit changes immediately after successful order processing
+                if conn:
+                    if not is_admin:
+                        cursor.execute("UPDATE authorized_users SET smilecoin_balance_ph = %s WHERE LOWER(username) = LOWER(%s)", (float(final_balance), username))
+                    else:
+                        cursor.execute("""
+                            UPDATE admins SET ph_coin = %s 
+                            WHERE (LOWER(username) = LOWER(%s) AND username IS NOT NULL AND username != '') 
+                            OR admin_id = %s
+                        """, (float(final_balance), username, str(user_id)))
+                    conn.commit()
 
             # Failed summary
             if failed_orders:
@@ -2021,7 +2048,18 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/orbr - 📜 View order history (BR)\n"
         "/checkID - 📜 Player\n"
         "/myid - 📜 Check Your Telegram ID\n"
-        "/redeem  - 💎 Exchange Redeem Code to Coin\n"
+        "/redeem  - 💎 Exchange Redeem Code to Coin\n\n"
+        "💡 *Special Keywords (BR):*\n"
+        "• `wp` - Weekly Diamond Pass\n"
+        "• `tp` - Twilight Pass\n"
+        "• `svp` - Super Value Pack\n"
+        "• `web` - Weekly Elite Bundle\n"
+        "• `meb` - Monthly Epic Bundle\n\n"
+        "💡 *Special Keywords (PH):*\n"
+        "• `wp` - Weekly Diamond Pass\n"
+        "• `gp` - Starlight Pass\n"
+        "• `svp` - Super Value Pack\n\n"
+        "Example: `/mk 12345678 1234 web`"
     )
     # conn.commit()
     # conn.close()

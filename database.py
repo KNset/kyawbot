@@ -116,16 +116,17 @@ def list_admin_users():
     conn.close()
     return users
 
-def list_admin_id(username):
+def list_admin_id(username_or_id):
     conn = get_connection()
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT admin_id FROM admins WHERE LOWER(username) = LOWER(%s)", (username,))
-        ids = [row[0] for row in cursor.fetchall()]
-        if ids:
-            return True
-        else:
-            return False
+        # Check by username or admin_id
+        cursor.execute("""
+            SELECT 1 FROM admins 
+            WHERE LOWER(username) = LOWER(%s) OR admin_id = %s
+        """, (str(username_or_id), str(username_or_id)))
+        result = cursor.fetchone()
+        return result is not None
     except Exception as e:
         return False
     finally:
