@@ -741,6 +741,7 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Send immediate processing message
         processing_msg = await update.message.reply_text("⚡ Processing your order...")
+        msg_deleted = False
         
         # Process arguments in chunks
         while i + 2 < len(args):
@@ -922,6 +923,13 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 summary += f"Amount    :   {sum_price:.2f} 🪙\n"
                 summary += f"Assets    :   {final_balance:.2f} 🪙\n"
 
+                if not msg_deleted:
+                    try:
+                        await processing_msg.delete()
+                        msg_deleted = True
+                    except Exception:
+                        pass
+
                 await update.message.reply_text(summary)
 
 
@@ -965,7 +973,13 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     if "Insufficient" in error:
                         error_msg = "❌ Insufficient Balance"
                         break
-                await processing_msg.edit_text(error_msg)
+                
+                if not msg_deleted:
+                    await processing_msg.edit_text(error_msg)
+                    msg_deleted = True
+                else:
+                    await update.message.reply_text(error_msg)
+
                 send_to_admin_bot(user_id, f"❌ Recharge failed:\n{fail_text}")
         if success_orders:
             pass
@@ -1057,17 +1071,26 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         processing_msg = await update.message.reply_text("⚡ Searching For your product...")
+        msg_deleted = False
 
         # Get product list and mapping
         response = get_product_list_ph()
         if not response or response.get('status') != 200:
-            await processing_msg.edit_text("❌ Failed to retrieve product list.")
+            if not msg_deleted:
+                await processing_msg.edit_text("❌ Failed to retrieve product list.")
+                msg_deleted = True
+            else:
+                await update.message.reply_text("❌ Failed to retrieve product list.")
             return
 
         # Get actual product mapping
         ph_mapping = get_ph_product_mapping()
         if not ph_mapping:
-            await processing_msg.edit_text("❌ Could not load product mapping.")
+            if not msg_deleted:
+                await processing_msg.edit_text("❌ Could not load product mapping.")
+                msg_deleted = True
+            else:
+                await update.message.reply_text("❌ Could not load product mapping.")
             return
 
         
@@ -1092,7 +1115,11 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     i += 1
 
             if count > 5:
-                await processing_msg.edit_text("❌ Max 5 items per order")
+                if not msg_deleted:
+                    await processing_msg.edit_text("❌ Max 5 items per order")
+                    msg_deleted = True
+                else:
+                    await update.message.reply_text("❌ Max 5 items per order")
                 continue
 
             # Determine packages and get product IDs
@@ -1118,7 +1145,11 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     diamond_count = int(diamond_input)  # Convert to integer
                     base_packages = exact_split_diamonds_ph(diamond_count)
                     if not base_packages:
-                        await processing_msg.edit_text(f"❌ Invalid diamond value: {diamond_input}")
+                        if not msg_deleted:
+                            await processing_msg.edit_text(f"❌ Invalid diamond value: {diamond_input}")
+                            msg_deleted = True
+                        else:
+                            await update.message.reply_text(f"❌ Invalid diamond value: {diamond_input}")
                         continue
                     # Use the actual diamond amount for product lookup
                     product_key = str(base_packages[0])
@@ -1126,17 +1157,29 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     # Multiply packages by count
                     diamond_packages = base_packages * count
                 except ValueError:
-                    await processing_msg.edit_text(f"❌ Invalid diamond value:")
+                    if not msg_deleted:
+                        await processing_msg.edit_text(f"❌ Invalid diamond value:")
+                        msg_deleted = True
+                    else:
+                        await update.message.reply_text(f"❌ Invalid diamond value:")
                     continue
 
             # Get game name
             try:
                 game_name_val = clean_text(gamename(userid, zoneid))
                 if(game_name_val == "Not found"):
-                    await processing_msg.edit_text(f"❌ User not found.")
+                    if not msg_deleted:
+                        await processing_msg.edit_text(f"❌ User not found.")
+                        msg_deleted = True
+                    else:
+                        await update.message.reply_text(f"❌ User not found.")
                     continue
             except Exception:
-                await processing_msg.edit_text(f"❌ API Error for user {userid} zone {zoneid}")
+                if not msg_deleted:
+                    await processing_msg.edit_text(f"❌ API Error for user {userid} zone {zoneid}")
+                    msg_deleted = True
+                else:
+                    await update.message.reply_text(f"❌ API Error for user {userid} zone {zoneid}")
                 continue
 
             # Process each package
@@ -1240,8 +1283,13 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 summary += f"Amount    :   {sum_price:.2f} 🪙\n"
                 summary += f"Assets    :   {final_balance:.2f} 🪙\n"
 
+                if not msg_deleted:
+                    try:
+                        await processing_msg.delete()
+                        msg_deleted = True
+                    except Exception:
+                        pass
 
-                
                 await update.message.reply_text(summary)
 
 
@@ -1279,7 +1327,12 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     if "Insufficient" in error:
                         error_msg = "❌ Insufficient Balance"
                         break
-                await processing_msg.edit_text(error_msg)
+                if not msg_deleted:
+                    await processing_msg.edit_text(error_msg)
+                    msg_deleted = True
+                else:
+                    await update.message.reply_text(error_msg)
+
                 send_to_admin_bot(user_id, f"❌ Recharge failed:\n{fail_text}")
         if success_orders:
             pass
