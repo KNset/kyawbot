@@ -739,8 +739,8 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("❌ Failed to retrieve product list.")
             return
 
-        # Send immediate processing message - REMOVED per request
-        # processing_msg = await update.message.reply_text("⚡ Processing your order...")
+        # Send immediate processing message
+        processing_msg = await update.message.reply_text("⚡ Processing your order...")
         
         # Process arguments in chunks
         while i + 2 < len(args):
@@ -761,7 +761,7 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     i += 1
 
             if count > 5:
-                await update.message.reply_text("❌ Max 5 items per order")
+                await processing_msg.edit_text("❌ Max 5 items per order")
                 continue
 
             # Determine diamond packages
@@ -788,14 +788,14 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 try:
                     diamond_count = int(diamond_input)
                 except ValueError:
-                    await update.message.reply_text(f"❌ Invalid diamond value: {diamond_input}")
+                    await processing_msg.edit_text(f"❌ Invalid diamond value: {diamond_input}")
                     continue
 
                 # diamond_packages = exact_split_diamonds(diamond_count) # Old single count logic
                 
                 base_packages = exact_split_diamonds(diamond_count)
                 if not base_packages:
-                    await update.message.reply_text(
+                    await processing_msg.edit_text(
                         f"❌ Invalid diamond value "
                     )
                     continue
@@ -807,10 +807,10 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 game_name_val = clean_text(gamename(userid, zoneid))
                 if(game_name_val == "Not found"):
-                    await update.message.reply_text(f"❌ User not found.")
+                    await processing_msg.edit_text(f"❌ User not found.")
                     continue
             except Exception:
-                await update.message.reply_text(f"❌ API Error for user {userid} zone {zoneid}")
+                await processing_msg.edit_text(f"❌ API Error for user {userid} zone {zoneid}")
                 continue
 
 
@@ -965,7 +965,7 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     if "Insufficient" in error:
                         error_msg = "❌ Insufficient Balance"
                         break
-                await update.message.reply_text(error_msg)
+                await processing_msg.edit_text(error_msg)
                 send_to_admin_bot(user_id, f"❌ Recharge failed:\n{fail_text}")
         if success_orders:
             pass
@@ -1056,18 +1056,18 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("❌ Invalid format. Usage: /mkp <userid> <zoneid> <diamonds/wp/gp> [count] ...")
             return
 
-        # processing_msg = await update.message.reply_text("⚡ Searching For your product...")
+        processing_msg = await update.message.reply_text("⚡ Searching For your product...")
 
         # Get product list and mapping
         response = get_product_list_ph()
         if not response or response.get('status') != 200:
-            await update.message.reply_text("❌ Failed to retrieve product list.")
+            await processing_msg.edit_text("❌ Failed to retrieve product list.")
             return
 
         # Get actual product mapping
         ph_mapping = get_ph_product_mapping()
         if not ph_mapping:
-            await update.message.reply_text("❌ Could not load product mapping.")
+            await processing_msg.edit_text("❌ Could not load product mapping.")
             return
 
         
@@ -1092,7 +1092,7 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     i += 1
 
             if count > 5:
-                await update.message.reply_text("❌ Max 5 items per order")
+                await processing_msg.edit_text("❌ Max 5 items per order")
                 continue
 
             # Determine packages and get product IDs
@@ -1118,7 +1118,7 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     diamond_count = int(diamond_input)  # Convert to integer
                     base_packages = exact_split_diamonds_ph(diamond_count)
                     if not base_packages:
-                        await update.message.reply_text(f"❌ Invalid diamond value: {diamond_input}")
+                        await processing_msg.edit_text(f"❌ Invalid diamond value: {diamond_input}")
                         continue
                     # Use the actual diamond amount for product lookup
                     product_key = str(base_packages[0])
@@ -1126,17 +1126,17 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     # Multiply packages by count
                     diamond_packages = base_packages * count
                 except ValueError:
-                    await update.message.reply_text(f"❌ Invalid diamond value:")
+                    await processing_msg.edit_text(f"❌ Invalid diamond value:")
                     continue
 
             # Get game name
             try:
                 game_name_val = clean_text(gamename(userid, zoneid))
                 if(game_name_val == "Not found"):
-                    await update.message.reply_text(f"❌ User not found.")
+                    await processing_msg.edit_text(f"❌ User not found.")
                     continue
             except Exception:
-                await update.message.reply_text(f"❌ API Error for user {userid} zone {zoneid}")
+                await processing_msg.edit_text(f"❌ API Error for user {userid} zone {zoneid}")
                 continue
 
             # Process each package
@@ -1279,7 +1279,7 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     if "Insufficient" in error:
                         error_msg = "❌ Insufficient Balance"
                         break
-                await update.message.reply_text(error_msg)
+                await processing_msg.edit_text(error_msg)
                 send_to_admin_bot(user_id, f"❌ Recharge failed:\n{fail_text}")
         if success_orders:
             pass
