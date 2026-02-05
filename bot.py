@@ -963,7 +963,7 @@ async def recharge_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await processing_msg.edit_text(error_msg)
                 send_to_admin_bot(user_id, f"❌ Recharge failed:\n{fail_text}")
         if success_orders:
-            await processing_msg.edit_text("✅ Order completed.")
+            pass
 
     except Exception as e:
         print("Error:", e)
@@ -1271,7 +1271,7 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await processing_msg.edit_text(error_msg)
                 send_to_admin_bot(user_id, f"❌ Recharge failed:\n{fail_text}")
         if success_orders:
-            await processing_msg.edit_text("✅ Order completed.")
+            pass
 
     except Exception as e:
         print(f"❌ Error in recharge_ph: {e}")
@@ -2348,6 +2348,35 @@ def get_all_admin_ids():
         if conn:
             conn.close()
 
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
+import re
+
+# ... (existing imports)
+
+# ... (existing code)
+
+async def handle_dot_commands(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle commands starting with a dot (.)"""
+    message_text = update.message.text
+    if not message_text:
+        return
+
+    # Check for .mk command
+    if message_text.startswith('.mk '):
+        # Manually parse args for .mk
+        args = message_text[4:].strip().split()
+        context.args = args
+        await recharge_br(update, context)
+        return
+
+    # Check for .mkp command
+    if message_text.startswith('.mkp '):
+        # Manually parse args for .mkp
+        args = message_text[5:].strip().split()
+        context.args = args
+        await recharge_ph(update, context)
+        return
+
 def main():
     init_db()
     create_order_ph()
@@ -2361,8 +2390,16 @@ def main():
     app.add_handler(CommandHandler("showph", show_products_ph))
     app.add_handler(CommandHandler("showbr", show_products_br))
     app.add_handler(CommandHandler("help", help_command))
+    
+    # Support both /mk and .mk
     app.add_handler(CommandHandler("mk", recharge_br))
+    
+    # Support both /mkp and .mkp
     app.add_handler(CommandHandler("mkp", recharge_ph))
+    
+    # Handler for dot commands (.mk, .mkp)
+    app.add_handler(MessageHandler(filters.Regex(r'^\.mk(p)?\s+'), handle_dot_commands))
+    
     app.add_handler(CommandHandler("balance", check_balance))
     app.add_handler(CommandHandler("orph", view_history_ph))
     app.add_handler(CommandHandler("orbr", view_history_br))
