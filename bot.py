@@ -2546,7 +2546,11 @@ async def gamename_mc(user_id, zone_id, region, product_id):
             # Pass a dummy productid as it's not strictly needed for check_role in current implementation
             try:
                 bot = SmileOneBot(uid=str(user_id), sid=str(zone_id), productid="dummy") 
-                if bot.check_role():
+                role_result = bot.check_role()
+                if role_result:
+                    # check_role now returns username string if successful, or True
+                    if isinstance(role_result, str):
+                        return role_result
                     return "Magic Chess Player" 
                 return "Not found"
             except SystemExit:

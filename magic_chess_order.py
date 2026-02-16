@@ -150,13 +150,15 @@ class SmileOneBot:
                     
                     # Check if role exists
                     if result.get('code') == 0 or result.get('status') == 'success':
-                        print("   ✅ Game role verified")
+                        username = result.get('username', '')
+                        print(f"   ✅ Game role verified: {username}")
+                        return username if username else True
                     else:
                         print("   ⚠️ Game role may not exist")
                         
                 except:
                     print(f"   Response: {response.text[:100]}")
-                return True
+                return False # Changed from True to False if json parsing fails or code != 0
             else:
                 print(f"❌ Role check failed (Status: {response.status_code})")
                 print(f"   Response: {response.text[:200]}")
