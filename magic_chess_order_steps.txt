@@ -1,0 +1,151 @@
+POST /br/merchant/game/checkrole?product=magicchessgogo HTTP/2
+Host: www.smile.one
+Cookie: _did=web_460257328DC25851; kwai_uuid=ca798ea2141e2d6757f48cc2057e81c0; __cf_bm=jbnOq82lh7.ZrTM2Sq9GPKJGFUfMnJvtAp63DuK81hA-1768382293-1.0.1.1-_Muhaex9Pw2YpHVo8NG3DnftluNUARnqPdPz9q2eUG.KJMeiqYgkpcMGNi9ZrexdB2W6fd6FkGhuZJ5fcldKPBOUTCHYlretxRC48ndR4WQ; _ga=GA1.2.268805792.1766746760; _ga_YP87JRK7PM=GS2.1.s1768382295$o5$g1$t1768382374$j60$l0$h0; _gat_UA-104883946-2=1; _gcl_au=1.1.804861047.1766746760; _gid=GA1.2.206779463.1768382295; cf_clearance=lvthgXNlVeR0sFIVnrXXKrJJsSoO5yIuY4iTpUr2qKQ-1768382294-1.2.1.1-C3yg0VOBNpUE.LZuOVkiDEg.Y52.SztlUFn2CzecGsMRL60kDmkoRBcoOy3podJgiYGWOgEPXty8CIm82pnyv6SoGw1_LlYWNcWabFhTafFzSXXNSJNhQG11mojPqJAUR54PT2ghPoakYU66YFG0KlFoOVxlNv8yISmYFZv.FlkLilE3To0763we4GNrjIkFG0U7HLDi_GmANOUSUpaAD0nmUXrW7Qdp6NNIaiGxhLg; notifi_status=disable; PHPSESSID=rj492v9lalm2snlkdl1o7s0kj8; _csrf=552004eba3515d8d93a4d177de4e66c0a115076d4bd3f11f1188e16de8c19a01a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22gjv1s4fJPdvT7IHCX9FAZiw6k9L288ta%22%3B%7D; anonymousId=dc112ef929cad53424489e242982ff06fea0a05cb225b077c3f522651e6907fca%3A2%3A%7Bi%3A0%3Bs%3A11%3A%22anonymousId%22%3Bi%3A1%3Bs%3A15%3A%22A-6992b22ac5c8a%22%3B%7D; website_path=9e65e334ddae88a3dada7377dc98538b83b8ca097e874a83e2a97d2f7580a4b4a%3A2%3A%7Bi%3A0%3Bs%3A12%3A%22website_path%22%3Bi%3A1%3Bs%3A4%3A%22%2Fbr%2F%22%3B%7D; input_data=90e5b4208ea80dc0f47001f56acfc51da16c23857d732560830e1ab27bc7eee4a%3A2%3A%7Bi%3A0%3Bs%3A10%3A%22input_data%22%3Bi%3A1%3Ba%3A1%3A%7Bs%3A25%3A%22magicchessgogo_input_data%22%3Ba%3A3%3A%7Bs%3A3%3A%22uid%22%3Bs%3A8%3A%2290901168%22%3Bs%3A3%3A%22sid%22%3Bs%3A4%3A%228002%22%3Bs%3A5%3A%22email%22%3Bs%3A8%3A%2290901168%22%3B%7D%7D%7D; cf_clearance=PrmNPh4gyTkwgvxAeZ.pFVdneHCNhVFyFD0dNawD3nQ-1771223248-1.2.1.1-Xee403VejSiyEksOZMXfrw1n3wLnzWRIrzcwzFSdg37BhWDoPJUrT8vwywbOKi0d.HNAWyxRI7n0Feh_1lEAWX_qpRMYH5Qrn.vXfPdzLCklNvRl2xCdkZqvx7bRw2eN639jZzSzbdg6F6T49kYcnUcwUEwRjDmDckJXGzx_F53trtkrRPKY79Ic2_ZeCYx7envLerABOZZDLpUxHjmoUlZJ6H0Zc8CxvPhPKuVhBXhWchfj2XYJuTFjS4CBCtWZ; __cf_bm=Bb0wNpyJ2qSbsc0.pk.RKbBpgdF1uD77g6Q.gFBsyUw-1771223313-1.0.1.1-KucKxX3vkgTcZF5U19p31moQN4xGCToxapi7Ax4wFqwZ_GiQPvftuuIvrTFEh8f4DyiXmZU3zWwd6xGlQezoF58FR5tgJdbAlgUH1f7XEak
+Content-Length: 33
+Sec-Ch-Ua-Full-Version-List: "Not:A-Brand";v="99.0.0.0", "Brave";v="145.0.0.0", "Chromium";v="145.0.0.0"
+Sec-Ch-Ua-Platform: "Windows"
+Sec-Ch-Ua: "Not:A-Brand";v="99", "Brave";v="145", "Chromium";v="145"
+Sec-Ch-Ua-Bitness: "64"
+Sec-Ch-Ua-Model: ""
+Sec-Ch-Ua-Mobile: ?0
+Sec-Ch-Ua-Arch: "x86"
+X-Requested-With: XMLHttpRequest
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+Accept: application/json, text/javascript, */*; q=0.01
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Sec-Ch-Ua-Platform-Version: "19.0.0"
+Sec-Gpc: 1
+Accept-Language: en-GB,en;q=0.9
+Origin: https://www.smile.one
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: https://www.smile.one/merchant/game/magicchessgogo?source=other
+Accept-Encoding: gzip, deflate
+Priority: u=1, i
+
+uid=90901168&sid=8002&checkrole=1
+
+
+
+
+
+
+POST /merchant/customer HTTP/2
+Host: www.smile.one
+Cookie: _did=web_460257328DC25851; kwai_uuid=ca798ea2141e2d6757f48cc2057e81c0; __cf_bm=jbnOq82lh7.ZrTM2Sq9GPKJGFUfMnJvtAp63DuK81hA-1768382293-1.0.1.1-_Muhaex9Pw2YpHVo8NG3DnftluNUARnqPdPz9q2eUG.KJMeiqYgkpcMGNi9ZrexdB2W6fd6FkGhuZJ5fcldKPBOUTCHYlretxRC48ndR4WQ; _ga=GA1.2.268805792.1766746760; _ga_YP87JRK7PM=GS2.1.s1768382295$o5$g1$t1768382374$j60$l0$h0; _gat_UA-104883946-2=1; _gcl_au=1.1.804861047.1766746760; _gid=GA1.2.206779463.1768382295; cf_clearance=lvthgXNlVeR0sFIVnrXXKrJJsSoO5yIuY4iTpUr2qKQ-1768382294-1.2.1.1-C3yg0VOBNpUE.LZuOVkiDEg.Y52.SztlUFn2CzecGsMRL60kDmkoRBcoOy3podJgiYGWOgEPXty8CIm82pnyv6SoGw1_LlYWNcWabFhTafFzSXXNSJNhQG11mojPqJAUR54PT2ghPoakYU66YFG0KlFoOVxlNv8yISmYFZv.FlkLilE3To0763we4GNrjIkFG0U7HLDi_GmANOUSUpaAD0nmUXrW7Qdp6NNIaiGxhLg; notifi_status=disable; PHPSESSID=rj492v9lalm2snlkdl1o7s0kj8; _csrf=552004eba3515d8d93a4d177de4e66c0a115076d4bd3f11f1188e16de8c19a01a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22gjv1s4fJPdvT7IHCX9FAZiw6k9L288ta%22%3B%7D; anonymousId=dc112ef929cad53424489e242982ff06fea0a05cb225b077c3f522651e6907fca%3A2%3A%7Bi%3A0%3Bs%3A11%3A%22anonymousId%22%3Bi%3A1%3Bs%3A15%3A%22A-6992b22ac5c8a%22%3B%7D; website_path=9e65e334ddae88a3dada7377dc98538b83b8ca097e874a83e2a97d2f7580a4b4a%3A2%3A%7Bi%3A0%3Bs%3A12%3A%22website_path%22%3Bi%3A1%3Bs%3A4%3A%22%2Fbr%2F%22%3B%7D; input_data=90e5b4208ea80dc0f47001f56acfc51da16c23857d732560830e1ab27bc7eee4a%3A2%3A%7Bi%3A0%3Bs%3A10%3A%22input_data%22%3Bi%3A1%3Ba%3A1%3A%7Bs%3A25%3A%22magicchessgogo_input_data%22%3Ba%3A3%3A%7Bs%3A3%3A%22uid%22%3Bs%3A8%3A%2290901168%22%3Bs%3A3%3A%22sid%22%3Bs%3A4%3A%228002%22%3Bs%3A5%3A%22email%22%3Bs%3A8%3A%2290901168%22%3B%7D%7D%7D; cf_clearance=PrmNPh4gyTkwgvxAeZ.pFVdneHCNhVFyFD0dNawD3nQ-1771223248-1.2.1.1-Xee403VejSiyEksOZMXfrw1n3wLnzWRIrzcwzFSdg37BhWDoPJUrT8vwywbOKi0d.HNAWyxRI7n0Feh_1lEAWX_qpRMYH5Qrn.vXfPdzLCklNvRl2xCdkZqvx7bRw2eN639jZzSzbdg6F6T49kYcnUcwUEwRjDmDckJXGzx_F53trtkrRPKY79Ic2_ZeCYx7envLerABOZZDLpUxHjmoUlZJ6H0Zc8CxvPhPKuVhBXhWchfj2XYJuTFjS4CBCtWZ; __cf_bm=SEBOjKUj9ECxLIuxT2kpLVIFbUJ78TeOtsUIyVkiQhs-1771223330-1.0.1.1-SUiEHmh06rfuyBYnggtB5PMcVPGLsvROJ0B6SkBrwMnZT5y4n4bEqnwTOFPF6D4jRxlfFoSgX6OLFZjz4jK77ZJImTbZVF88EfMmJPTWbvs
+Content-Length: 11
+Sec-Ch-Ua-Full-Version-List: "Not:A-Brand";v="99.0.0.0", "Brave";v="145.0.0.0", "Chromium";v="145.0.0.0"
+Sec-Ch-Ua-Platform: "Windows"
+Sec-Ch-Ua: "Not:A-Brand";v="99", "Brave";v="145", "Chromium";v="145"
+Sec-Ch-Ua-Bitness: "64"
+Sec-Ch-Ua-Model: ""
+Sec-Ch-Ua-Mobile: ?0
+Sec-Ch-Ua-Arch: "x86"
+X-Requested-With: XMLHttpRequest
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+Accept: application/json, text/javascript, */*; q=0.01
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Sec-Ch-Ua-Platform-Version: "19.0.0"
+Sec-Gpc: 1
+Accept-Language: en-GB,en;q=0.9
+Origin: https://www.smile.one
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: https://www.smile.one/merchant/game/magicchessgogo?source=other
+Accept-Encoding: gzip, deflate
+Priority: u=1, i
+
+check=check
+
+
+
+
+
+POST /br/merchant/game/createorder?product=magicchessgogo HTTP/2
+Host: www.smile.one
+Cookie: _did=web_460257328DC25851; kwai_uuid=ca798ea2141e2d6757f48cc2057e81c0; __cf_bm=jbnOq82lh7.ZrTM2Sq9GPKJGFUfMnJvtAp63DuK81hA-1768382293-1.0.1.1-_Muhaex9Pw2YpHVo8NG3DnftluNUARnqPdPz9q2eUG.KJMeiqYgkpcMGNi9ZrexdB2W6fd6FkGhuZJ5fcldKPBOUTCHYlretxRC48ndR4WQ; _ga=GA1.2.268805792.1766746760; _ga_YP87JRK7PM=GS2.1.s1768382295$o5$g1$t1768382374$j60$l0$h0; _gat_UA-104883946-2=1; _gcl_au=1.1.804861047.1766746760; _gid=GA1.2.206779463.1768382295; cf_clearance=lvthgXNlVeR0sFIVnrXXKrJJsSoO5yIuY4iTpUr2qKQ-1768382294-1.2.1.1-C3yg0VOBNpUE.LZuOVkiDEg.Y52.SztlUFn2CzecGsMRL60kDmkoRBcoOy3podJgiYGWOgEPXty8CIm82pnyv6SoGw1_LlYWNcWabFhTafFzSXXNSJNhQG11mojPqJAUR54PT2ghPoakYU66YFG0KlFoOVxlNv8yISmYFZv.FlkLilE3To0763we4GNrjIkFG0U7HLDi_GmANOUSUpaAD0nmUXrW7Qdp6NNIaiGxhLg; notifi_status=disable; PHPSESSID=rj492v9lalm2snlkdl1o7s0kj8; _csrf=552004eba3515d8d93a4d177de4e66c0a115076d4bd3f11f1188e16de8c19a01a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22gjv1s4fJPdvT7IHCX9FAZiw6k9L288ta%22%3B%7D; anonymousId=dc112ef929cad53424489e242982ff06fea0a05cb225b077c3f522651e6907fca%3A2%3A%7Bi%3A0%3Bs%3A11%3A%22anonymousId%22%3Bi%3A1%3Bs%3A15%3A%22A-6992b22ac5c8a%22%3B%7D; website_path=9e65e334ddae88a3dada7377dc98538b83b8ca097e874a83e2a97d2f7580a4b4a%3A2%3A%7Bi%3A0%3Bs%3A12%3A%22website_path%22%3Bi%3A1%3Bs%3A4%3A%22%2Fbr%2F%22%3B%7D; input_data=90e5b4208ea80dc0f47001f56acfc51da16c23857d732560830e1ab27bc7eee4a%3A2%3A%7Bi%3A0%3Bs%3A10%3A%22input_data%22%3Bi%3A1%3Ba%3A1%3A%7Bs%3A25%3A%22magicchessgogo_input_data%22%3Ba%3A3%3A%7Bs%3A3%3A%22uid%22%3Bs%3A8%3A%2290901168%22%3Bs%3A3%3A%22sid%22%3Bs%3A4%3A%228002%22%3Bs%3A5%3A%22email%22%3Bs%3A8%3A%2290901168%22%3B%7D%7D%7D; cf_clearance=PrmNPh4gyTkwgvxAeZ.pFVdneHCNhVFyFD0dNawD3nQ-1771223248-1.2.1.1-Xee403VejSiyEksOZMXfrw1n3wLnzWRIrzcwzFSdg37BhWDoPJUrT8vwywbOKi0d.HNAWyxRI7n0Feh_1lEAWX_qpRMYH5Qrn.vXfPdzLCklNvRl2xCdkZqvx7bRw2eN639jZzSzbdg6F6T49kYcnUcwUEwRjDmDckJXGzx_F53trtkrRPKY79Ic2_ZeCYx7envLerABOZZDLpUxHjmoUlZJ6H0Zc8CxvPhPKuVhBXhWchfj2XYJuTFjS4CBCtWZ; __cf_bm=zEPjUwoidoYkKDQ41VNDEAQt7m_LScPQPUFFtXo8ubk-1771223353-1.0.1.1-Ltsd_8WXsXa_1AlOVO3bIfnx00FaMnjdLdSVK1jdNVSf_kBeCIvSpEl7i1HFj7ucRX8MkhAzXubtykaPVQ7eGi2K6T6A4LnAFuQLLsEhkZU
+Content-Length: 77
+Sec-Ch-Ua-Full-Version-List: "Not:A-Brand";v="99.0.0.0", "Brave";v="145.0.0.0", "Chromium";v="145.0.0.0"
+Sec-Ch-Ua-Platform: "Windows"
+Sec-Ch-Ua: "Not:A-Brand";v="99", "Brave";v="145", "Chromium";v="145"
+Sec-Ch-Ua-Bitness: "64"
+Sec-Ch-Ua-Model: ""
+Sec-Ch-Ua-Mobile: ?0
+Sec-Ch-Ua-Arch: "x86"
+X-Requested-With: XMLHttpRequest
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+Accept: application/json, text/javascript, */*; q=0.01
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Sec-Ch-Ua-Platform-Version: "19.0.0"
+Sec-Gpc: 1
+Accept-Language: en-GB,en;q=0.9
+Origin: https://www.smile.one
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: https://www.smile.one/merchant/game/magicchessgogo?source=other
+Accept-Encoding: gzip, deflate
+Priority: u=0, i
+
+uid=90901168&sid=8002&productid=23837&channel_method=smilecoin&external=false
+
+
+
+
+POST /merchant/game/pay HTTP/2
+Host: www.smile.one
+Cookie: _did=web_460257328DC25851; kwai_uuid=ca798ea2141e2d6757f48cc2057e81c0; __cf_bm=jbnOq82lh7.ZrTM2Sq9GPKJGFUfMnJvtAp63DuK81hA-1768382293-1.0.1.1-_Muhaex9Pw2YpHVo8NG3DnftluNUARnqPdPz9q2eUG.KJMeiqYgkpcMGNi9ZrexdB2W6fd6FkGhuZJ5fcldKPBOUTCHYlretxRC48ndR4WQ; _ga=GA1.2.268805792.1766746760; _ga_YP87JRK7PM=GS2.1.s1768382295$o5$g1$t1768382374$j60$l0$h0; _gat_UA-104883946-2=1; _gcl_au=1.1.804861047.1766746760; _gid=GA1.2.206779463.1768382295; cf_clearance=lvthgXNlVeR0sFIVnrXXKrJJsSoO5yIuY4iTpUr2qKQ-1768382294-1.2.1.1-C3yg0VOBNpUE.LZuOVkiDEg.Y52.SztlUFn2CzecGsMRL60kDmkoRBcoOy3podJgiYGWOgEPXty8CIm82pnyv6SoGw1_LlYWNcWabFhTafFzSXXNSJNhQG11mojPqJAUR54PT2ghPoakYU66YFG0KlFoOVxlNv8yISmYFZv.FlkLilE3To0763we4GNrjIkFG0U7HLDi_GmANOUSUpaAD0nmUXrW7Qdp6NNIaiGxhLg; notifi_status=disable; PHPSESSID=rj492v9lalm2snlkdl1o7s0kj8; _csrf=552004eba3515d8d93a4d177de4e66c0a115076d4bd3f11f1188e16de8c19a01a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22gjv1s4fJPdvT7IHCX9FAZiw6k9L288ta%22%3B%7D; anonymousId=dc112ef929cad53424489e242982ff06fea0a05cb225b077c3f522651e6907fca%3A2%3A%7Bi%3A0%3Bs%3A11%3A%22anonymousId%22%3Bi%3A1%3Bs%3A15%3A%22A-6992b22ac5c8a%22%3B%7D; website_path=9e65e334ddae88a3dada7377dc98538b83b8ca097e874a83e2a97d2f7580a4b4a%3A2%3A%7Bi%3A0%3Bs%3A12%3A%22website_path%22%3Bi%3A1%3Bs%3A4%3A%22%2Fbr%2F%22%3B%7D; input_data=90e5b4208ea80dc0f47001f56acfc51da16c23857d732560830e1ab27bc7eee4a%3A2%3A%7Bi%3A0%3Bs%3A10%3A%22input_data%22%3Bi%3A1%3Ba%3A1%3A%7Bs%3A25%3A%22magicchessgogo_input_data%22%3Ba%3A3%3A%7Bs%3A3%3A%22uid%22%3Bs%3A8%3A%2290901168%22%3Bs%3A3%3A%22sid%22%3Bs%3A4%3A%228002%22%3Bs%3A5%3A%22email%22%3Bs%3A8%3A%2290901168%22%3B%7D%7D%7D; cf_clearance=PrmNPh4gyTkwgvxAeZ.pFVdneHCNhVFyFD0dNawD3nQ-1771223248-1.2.1.1-Xee403VejSiyEksOZMXfrw1n3wLnzWRIrzcwzFSdg37BhWDoPJUrT8vwywbOKi0d.HNAWyxRI7n0Feh_1lEAWX_qpRMYH5Qrn.vXfPdzLCklNvRl2xCdkZqvx7bRw2eN639jZzSzbdg6F6T49kYcnUcwUEwRjDmDckJXGzx_F53trtkrRPKY79Ic2_ZeCYx7envLerABOZZDLpUxHjmoUlZJ6H0Zc8CxvPhPKuVhBXhWchfj2XYJuTFjS4CBCtWZ; __cf_bm=YhhQ96QwUeobEHJts4NpRCBsAVe0yz2Ff155HXYeKrU-1771223370-1.0.1.1-vX_HvDsBUn7duEWWv77M6Tz7I0qRUQ6Et_zsQKlEy3YtRdIEfvpWPPgAqI9BZWROB78ZJFpnODK.qcqej81Hb5j60jK44N3kZFUI4qLKjaI
+Content-Length: 294
+Cache-Control: max-age=0
+Sec-Ch-Ua: "Not:A-Brand";v="99", "Brave";v="145", "Chromium";v="145"
+Sec-Ch-Ua-Mobile: ?0
+Sec-Ch-Ua-Arch: "x86"
+Sec-Ch-Ua-Platform: "Windows"
+Sec-Ch-Ua-Platform-Version: "19.0.0"
+Sec-Ch-Ua-Model: ""
+Sec-Ch-Ua-Bitness: "64"
+Sec-Ch-Ua-Full-Version-List: "Not:A-Brand";v="99.0.0.0", "Brave";v="145.0.0.0", "Chromium";v="145.0.0.0"
+Origin: https://www.smile.one
+Content-Type: application/x-www-form-urlencoded
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8
+Sec-Gpc: 1
+Accept-Language: en-GB,en;q=0.9
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: navigate
+Sec-Fetch-Dest: document
+Referer: https://www.smile.one/merchant/game/magicchessgogo?source=other
+Accept-Encoding: gzip, deflate
+Priority: u=0, i
+
+_csrf=Lu6DsDht3FTm5hI7f_a94hK7Q-B5KnYLpB4OMszcLJBJhPWBS1m6HraCZG9Iv_WhSoIFoSNDAT3PJ0IA9ORY8Q%3D%3D&uid=90901168&sid=8002&email=&pay_methond=smilecoin&channel_method=smilecoin&flowid=1202602161c1425b176ab7000&pay_country=&coupon_id=&zipcode=&product=magicchessgogo&productid=23837&external=false
+
+
+
+GET /message/message HTTP/2
+Host: www.smile.one
+Cookie: _did=web_460257328DC25851; kwai_uuid=ca798ea2141e2d6757f48cc2057e81c0; __cf_bm=jbnOq82lh7.ZrTM2Sq9GPKJGFUfMnJvtAp63DuK81hA-1768382293-1.0.1.1-_Muhaex9Pw2YpHVo8NG3DnftluNUARnqPdPz9q2eUG.KJMeiqYgkpcMGNi9ZrexdB2W6fd6FkGhuZJ5fcldKPBOUTCHYlretxRC48ndR4WQ; _ga=GA1.2.268805792.1766746760; _ga_YP87JRK7PM=GS2.1.s1768382295$o5$g1$t1768382374$j60$l0$h0; _gat_UA-104883946-2=1; _gcl_au=1.1.804861047.1766746760; _gid=GA1.2.206779463.1768382295; cf_clearance=lvthgXNlVeR0sFIVnrXXKrJJsSoO5yIuY4iTpUr2qKQ-1768382294-1.2.1.1-C3yg0VOBNpUE.LZuOVkiDEg.Y52.SztlUFn2CzecGsMRL60kDmkoRBcoOy3podJgiYGWOgEPXty8CIm82pnyv6SoGw1_LlYWNcWabFhTafFzSXXNSJNhQG11mojPqJAUR54PT2ghPoakYU66YFG0KlFoOVxlNv8yISmYFZv.FlkLilE3To0763we4GNrjIkFG0U7HLDi_GmANOUSUpaAD0nmUXrW7Qdp6NNIaiGxhLg; notifi_status=disable; PHPSESSID=rj492v9lalm2snlkdl1o7s0kj8; _csrf=552004eba3515d8d93a4d177de4e66c0a115076d4bd3f11f1188e16de8c19a01a%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22gjv1s4fJPdvT7IHCX9FAZiw6k9L288ta%22%3B%7D; anonymousId=dc112ef929cad53424489e242982ff06fea0a05cb225b077c3f522651e6907fca%3A2%3A%7Bi%3A0%3Bs%3A11%3A%22anonymousId%22%3Bi%3A1%3Bs%3A15%3A%22A-6992b22ac5c8a%22%3B%7D; website_path=9e65e334ddae88a3dada7377dc98538b83b8ca097e874a83e2a97d2f7580a4b4a%3A2%3A%7Bi%3A0%3Bs%3A12%3A%22website_path%22%3Bi%3A1%3Bs%3A4%3A%22%2Fbr%2F%22%3B%7D; input_data=90e5b4208ea80dc0f47001f56acfc51da16c23857d732560830e1ab27bc7eee4a%3A2%3A%7Bi%3A0%3Bs%3A10%3A%22input_data%22%3Bi%3A1%3Ba%3A1%3A%7Bs%3A25%3A%22magicchessgogo_input_data%22%3Ba%3A3%3A%7Bs%3A3%3A%22uid%22%3Bs%3A8%3A%2290901168%22%3Bs%3A3%3A%22sid%22%3Bs%3A4%3A%228002%22%3Bs%3A5%3A%22email%22%3Bs%3A8%3A%2290901168%22%3B%7D%7D%7D; cf_clearance=PrmNPh4gyTkwgvxAeZ.pFVdneHCNhVFyFD0dNawD3nQ-1771223248-1.2.1.1-Xee403VejSiyEksOZMXfrw1n3wLnzWRIrzcwzFSdg37BhWDoPJUrT8vwywbOKi0d.HNAWyxRI7n0Feh_1lEAWX_qpRMYH5Qrn.vXfPdzLCklNvRl2xCdkZqvx7bRw2eN639jZzSzbdg6F6T49kYcnUcwUEwRjDmDckJXGzx_F53trtkrRPKY79Ic2_ZeCYx7envLerABOZZDLpUxHjmoUlZJ6H0Zc8CxvPhPKuVhBXhWchfj2XYJuTFjS4CBCtWZ; __cf_bm=IU1o3OFRN9zpO.kcvHuRuagYcm89wXie3UuSrmFI3Ac-1771223383-1.0.1.1-7mwriyneeBJMl4KKjjKFbNEe1E7D0VMZm9kb6_hxQ7PaqnhaRk8387HeKFQHauph4.FDCrGJKamU6S7_m1xUxaVlCKcotsP_ns0.USkHn10
+Cache-Control: max-age=0
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8
+Sec-Gpc: 1
+Accept-Language: en-GB,en;q=0.9
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: navigate
+Sec-Fetch-Dest: document
+Sec-Ch-Ua: "Not:A-Brand";v="99", "Brave";v="145", "Chromium";v="145"
+Sec-Ch-Ua-Mobile: ?0
+Sec-Ch-Ua-Arch: "x86"
+Sec-Ch-Ua-Platform: "Windows"
+Sec-Ch-Ua-Platform-Version: "19.0.0"
+Sec-Ch-Ua-Model: ""
+Sec-Ch-Ua-Bitness: "64"
+Sec-Ch-Ua-Full-Version-List: "Not:A-Brand";v="99.0.0.0", "Brave";v="145.0.0.0", "Chromium";v="145.0.0.0"
+Referer: https://www.smile.one/merchant/game/magicchessgogo?source=other
+Accept-Encoding: gzip, deflate
+Priority: u=0, i
+

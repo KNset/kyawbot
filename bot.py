@@ -102,8 +102,10 @@ config = {
     #"TOKEN": "7471922595:AAH_qMW0b1PTNVK4fzxteL4ENru704aDtsk", #shine
     #"TOKEN": "8457013411:AAEgmqenIS3rGou58tRayumTzDn5L0j_VL0", # madeinmyanmarBot
     #"TOKEN": "8336856493:AAHxGvE83jMQdPGwruGq47xhfFfcXxmzwEs", #renzy bot
-    "TOKEN": "8237614023:AAFDETzY5tqXdFXmVO26fuOxHtVme2XxKto", #kyawbot
-    #"TOKEN": "8382899337:AAHEOI6vK66CRfEUIggku5GE_GlbKCMQjEs", #Test Bot
+
+    #"TOKEN": "8237614023:AAFDETzY5tqXdFXmVO26fuOxHtVme2XxKto", #kyawbot
+    "TOKEN": "8382899337:AAHEOI6vK66CRfEUIggku5GE_GlbKCMQjEs", #Test Bot
+    
     
     #"API_KEY": "22d687785ac420062a47842f83005d43",
     "API_KEY":  "5ac7dae900ad537222746493c15d7bb1",
@@ -271,6 +273,46 @@ def get_product_list_ph():
     uid = config["UID"]
     email = config["EMAIL"]
     product = "mobilelegends"
+    m_key = config["API_KEY"]
+    timestamp = int(time.time())
+
+    data = {
+        "uid": uid,
+        "email": email,
+        "product": product,
+        "time": timestamp
+    }
+
+    data["sign"] = generate_sign(data, m_key)
+
+    url = "https://www.smile.one/ph/smilecoin/api/productlist"
+    response = requests.post(url, data=data)
+
+    try:
+        return response.json()
+    except Exception as e:
+        print("Error:", e)
+        print("Response:", response.text)
+        return None
+
+def get_product_list_mc_br():
+    current_time = int(time.time())
+    params = {
+        'uid': config["UID"],
+        'email': config["EMAIL"],
+        'product': "magicchessgogo",
+        'time': current_time
+    }
+    sign = generate_sign(params, config["API_KEY"])
+    params['sign'] = sign
+    url = "https://www.smile.one/br/smilecoin/api/productlist"
+    response = requests.post(url, data=params)
+    return response.json()
+
+def get_product_list_mc_ph():
+    uid = config["UID"]
+    email = config["EMAIL"]
+    product = "magicchessgogo"
     m_key = config["API_KEY"]
     timestamp = int(time.time())
 
@@ -547,6 +589,71 @@ async def show_products_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(chunk, parse_mode='Markdown')
     else:
         await update.message.reply_text("❌ Failed to fetch products. Please try again later.")
+
+def escape_markdown_v2(text):
+    """Helper to escape MarkdownV2 special characters"""
+    escape_chars = r'_*[]()~`>#+-=|{}.!'
+    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
+
+@restricted_to_pro_users
+async def show_products_mc_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    response = get_product_list_mc_br()
+    if response and response.get('status') == 200:
+        products = response['data']['product']
+        message_lines = ["♟️ Available Products for Magic Chess: Go Go (BR) ♟️\n"]
+        for p in products:
+            name = p.get('spu', 'Unknown')
+            # Clean up name: remove "Magic Chess: Go Go BR - " and "diamond_"
+            clean_name = name.replace("Magic Chess: Go Go BR - ", "").replace("diamond_", "")
+            # Capitalize first letter if it's a word
+            if not clean_name[0].isdigit():
+                clean_name = clean_name.title()
+            
+            price_val = float(p.get('product_price') or p.get('price') or '0.00')
+            discount_val = float(p.get('discount') or 0)
+            final_price = (price_val - discount_val) * 10.0 
+            message_lines.append(f"💎 {clean_name} - 🪙{final_price:.2f}")
+        
+        full_msg = "\n".join(message_lines)
+        
+        if len(full_msg) > 4000:
+             for i in range(0, len(full_msg), 4000):
+                 await update.message.reply_text(full_msg[i:i+4000]) # No parse_mode
+        else:
+            await update.message.reply_text(full_msg) # No parse_mode
+    else:
+        await update.message.reply_text("❌ Failed to fetch MC BR products.")
+
+@restricted_to_pro_users
+async def show_products_mc_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    response = get_product_list_mc_ph()
+    if response and response.get('status') == 200:
+        products = response['data']['product']
+        message_lines = ["♟️ Available Products for Magic Chess: Go Go (PH) ♟️\n"]
+        for p in products:
+            name = p.get('spu', 'Unknown')
+            # Clean up name
+            clean_name = name.replace("Magic Chess: Go Go PH - ", "").replace("diamond_", "")
+            # Remove redundant "Diamonds" if present to keep it short
+            clean_name = clean_name.replace(" Diamonds", "")
+            
+            if not clean_name[0].isdigit():
+                 clean_name = clean_name.title()
+
+            price_val = float(p.get('cost_price') or p.get('price') or '0.00')
+            discount_val = float(p.get('discount') or 0)
+            final_price = price_val - discount_val
+            message_lines.append(f"💎 {clean_name} - 🪙{final_price:.2f}")
+        
+        full_msg = "\n".join(message_lines)
+        
+        if len(full_msg) > 4000:
+             for i in range(0, len(full_msg), 4000):
+                 await update.message.reply_text(full_msg[i:i+4000]) # No parse_mode
+        else:
+            await update.message.reply_text(full_msg) # No parse_mode
+    else:
+        await update.message.reply_text("❌ Failed to fetch MC PH products.")
 
 
 def gamename(user_id, zone_id):
@@ -2104,10 +2211,14 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "🆘 *Help Menu*\n\n"
         "Here are the available commands:\n"
         "/balance - 💰 Check current balance\n"
-        "/showph - 📦 Show  products (PH)\n"
-        "/showbr - 📦 Show  products (BR)\n"
+        "/showph - 📦 Show MLBB products (PH)\n"
+        "/showbr - 📦 Show MLBB products (BR)\n"
+        "/showmcp - ♟️ Show Magic Chess products (PH)\n"
+        "/showmc  - ♟️ Show Magic Chess products (BR)\n"
         "/mkp - 💎 Recharge MLBB (PH)\n"
         "/mk  - 💎 Recharge MLBB (BR)\n"
+        "/mcp - ♟️ Recharge Magic Chess (PH)\n"
+        "/mc  - ♟️ Recharge Magic Chess (BR)\n"
         "/orph - 📜 View order history (PH)\n"
         "/orbr - 📜 View order history (BR)\n"
         "/checkID - 📜 Player\n"
@@ -2123,6 +2234,11 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "• `wp` - Weekly Diamond Pass\n"
         "• `gp` - Starlight Pass\n"
         "• `svp` - Super Value Pack\n\n"
+        "💡 *Special Keywords (Magic Chess):*\n"
+        "• `gbb` - GoLukas's Battle Bounty\n"
+        "• `gbd` - GoBattle for Discounts\n"
+        "• `gpb` - GoPromotion Bounty\n"
+        "• `gwdp` - GoWeekly Diamond Pass\n\n"
         "Example: `/mk 12345678 1234 web`"
     )
     # conn.commit()
@@ -2419,6 +2535,295 @@ import re
 
 # ... (existing code)
 
+from magic_chess_order import SmileOneBot
+
+async def gamename_mc(user_id, zone_id, region, product_id):
+    """Verify Magic Chess user via SmileOneBot"""
+    try:
+        loop = asyncio.get_running_loop()
+        def _verify():
+            # Use mg_cookies.txt as defined in SmileOneBot
+            # Pass a dummy productid as it's not strictly needed for check_role in current implementation
+            try:
+                bot = SmileOneBot(uid=str(user_id), sid=str(zone_id), productid="dummy") 
+                if bot.check_role():
+                    return "Magic Chess Player" 
+                return "Not found"
+            except SystemExit:
+                return "Error: Cookie File Missing"
+            except Exception as e:
+                print(f"Verify Error: {e}")
+                return "Error"
+
+        result = await loop.run_in_executor(None, _verify)
+        return result
+    except Exception as e:
+        print(f"Error checking MC gamename: {e}")
+        return "Error"
+
+async def recharge_mc_generic(update: Update, context: ContextTypes.DEFAULT_TYPE, region):
+    username = clean_text(update.effective_user.username)
+    full_name = clean_text(update.effective_user.full_name)
+    user_id = update.effective_user.id
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    is_admin = bool(list_admin_id(username) or list_admin_id(user_id))
+
+    try:
+        # Get balance
+        balance_column = "smilecoin_balance_br" if region == "BR" else "smilecoin_balance_ph"
+        admin_balance_column = "br_coin" if region == "BR" else "ph_coin"
+        
+        if not is_admin:
+            cursor.execute(f"SELECT {balance_column} FROM authorized_users WHERE LOWER(username) = LOWER(%s)", (username,))
+        else:
+            cursor.execute(f"SELECT {admin_balance_column} FROM admins WHERE (LOWER(username) = LOWER(%s) AND username IS NOT NULL AND username != '') OR admin_id = %s", (username, str(user_id)))
+        row = cursor.fetchone()
+        if not row:
+            await update.message.reply_text(f"❌ User @{username} not found in database.")
+            return
+
+        current_balance = float(row[0] or 0.0)
+        running_balance = current_balance
+        
+        # Handle compact arguments like 12345(6789)100
+        raw_args = " ".join(context.args)
+        cleaned_args = raw_args.replace("(", " ").replace(")", " ")
+        args = cleaned_args.split()
+
+        if len(args) < 3:
+            cmd = "/mc" if region == "BR" else "/mcp"
+            await update.message.reply_text(f"❌ Invalid format. Usage: {cmd} <userid> <zoneid> <diamonds> [count] ...")
+            return
+
+        processing_msg = await update.message.reply_text("⚡ Processing your order...")
+        msg_deleted = False
+
+        # Get product list
+        response = get_product_list_mc_br() if region == "BR" else get_product_list_mc_ph()
+        
+        if not response or response.get('status') != 200:
+            if not msg_deleted:
+                await processing_msg.edit_text("❌ Failed to retrieve product list.")
+                msg_deleted = True
+            else:
+                await update.message.reply_text("❌ Failed to retrieve product list.")
+            return
+
+        products = response['data']['product']
+        test_product_id = products[0]['id'] if products else None
+
+        i = 0
+        while i + 2 < len(args):
+            success_orders = []
+            failed_orders = []
+            sum_price = 0.0
+            
+            userid = clean_text(args[i])
+            zoneid = clean_text(args[i + 1])
+            diamond_input = clean_text(args[i + 2])
+            i += 3
+
+            count = 1
+            if i < len(args) and args[i].isdigit():
+                possible_count = int(args[i])
+                if possible_count <= 5:
+                    count = possible_count
+                    i += 1
+
+            if count > 5:
+                if not msg_deleted:
+                    await processing_msg.edit_text("❌ Max 5 items per order")
+                    msg_deleted = True
+                else:
+                    await update.message.reply_text("❌ Max 5 items per order")
+                continue
+
+            # Verify User (using the first product ID we found)
+            if test_product_id:
+                game_name_val = await gamename_mc(userid, zoneid, region, test_product_id)
+            else:
+                game_name_val = "Unknown"
+
+            if game_name_val == "Not found" or game_name_val == "Error":
+                 # Maybe try anyway? Or fail?
+                 # If checkrole fails, user ID might be wrong.
+                 pass
+
+            # Determine product
+            matched_product = None
+            
+            # Magic Chess Package Mapping
+            mc_keywords = {
+                'gbb': "GoLukas's Battle Bounty",
+                'gbd': "GoBattle for Discounts",
+                'gpb': "GoPromotion Bounty",
+                'gwdp': "GoWeekly Diamond Pass"
+            }
+            
+            # Normalize input
+            normalized_input = diamond_input.lower()
+            target_name = mc_keywords.get(normalized_input)
+
+            if target_name:
+                # Match by mapped name
+                for p in products:
+                    if target_name.lower() in p.get('spu', '').lower():
+                        matched_product = p
+                        break
+            else:
+                # Simple matching by amount or name
+                try:
+                    target_amount = int(diamond_input)
+                    for p in products:
+                        name = p.get('spu', '')
+                        # Try to extract exact diamond amount from name
+                        # Format usually: "Magic Chess: Go Go BR - diamond_55" or "55 Diamonds"
+                        # We use regex to find standalone numbers or numbers after underscore/space
+                        found_amount = 0
+                        # Try to parse "diamond_55" format
+                        import re
+                        match = re.search(r'diamond_(\d+)', name, re.IGNORECASE)
+                        if match:
+                             found_amount = int(match.group(1))
+                        else:
+                             # Fallback to existing extract function if available
+                             found_amount = extract_total_diamonds_br(name) if region == "BR" else extract_total_diamonds_ph(name)
+                        
+                        if found_amount == target_amount:
+                            matched_product = p
+                            break
+                except ValueError:
+                    for p in products:
+                        if diamond_input.lower() in p.get('spu', '').lower():
+                            matched_product = p
+                            break
+            
+            if not matched_product:
+                failed_orders.append(f"No product found for {diamond_input}")
+            else:
+                # Calculate price
+                try:
+                    price_val = float(matched_product.get('cost_price') or matched_product.get('price') or '0.00')
+                    discount_val = float(matched_product.get('discount') or 0)
+                    if region == "BR":
+                        price_per_unit = (price_val - discount_val) * 10.0
+                    else:
+                        price_per_unit = price_val
+                except:
+                    price_per_unit = 0.0
+
+                if running_balance < price_per_unit * count:
+                     failed_orders.append(f"Insufficient balance for {diamond_input}")
+                else:
+                    timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+                    product_name = matched_product.get('spu', diamond_input)
+                    
+                    for _ in range(count):
+                        try:
+                            # Use new SmileOneBot
+                            # Note: SmileOneBot expects productid to be string
+                            loop = asyncio.get_running_loop()
+                            
+                            def _execute_order():
+                                try:
+                                    bot = SmileOneBot(
+                                        uid=str(userid), 
+                                        sid=str(zoneid), 
+                                        productid=str(matched_product['id'])
+                                    )
+                                    return bot.run_full_flow()
+                                except SystemExit:
+                                    return False
+                                except Exception as e:
+                                    print(f"Order Exec Error: {e}")
+                                    return False
+
+                            order_success = await loop.run_in_executor(None, _execute_order)
+                            
+                            if order_success:
+                                success_orders.append({
+                                    'order_id': generate_sn(),
+                                    'package': product_name,
+                                    'price': price_per_unit
+                                })
+                                running_balance -= price_per_unit
+                                sum_price += price_per_unit
+                                # The new bot doesn't easily return username in run_full_flow return value
+                                # but we already verified role earlier or we can use generic name
+                                if game_name_val == "Unknown":
+                                     game_name_val = "Magic Chess Player"
+                            else:
+                                failed_orders.append(f"Order failed for {product_name}")
+                        except Exception as e:
+                            failed_orders.append(f"Exception: {str(e)}")
+
+            if success_orders:
+                final_balance = running_balance
+                summary = "==== Transaction Report! ====\n\n"
+                summary += f"UID       :   {userid} ({zoneid})\n"
+                summary += f"Name      :   {game_name_val}\n"
+                summary += f"SN        :\n"
+                for oid in success_orders:
+                    summary += f"{oid['order_id']} ({oid['package']})\n"
+                summary += f"Ordered   :   {len(success_orders)} package\n"
+                summary += f"Time      :   {timestamp}\n"
+                summary += f"==== {username} ====\n"
+                summary += f"Amount    :   {sum_price:.2f} 🪙\n"
+                summary += f"Assets    :   {final_balance:.2f} 🪙\n"
+
+                if not msg_deleted:
+                    try:
+                        await processing_msg.delete()
+                        msg_deleted = True
+                    except: pass
+                
+                await update.message.reply_text(summary)
+                
+                # Save to DB
+                table = "br_order_history" if region == "BR" else "ph_order_history"
+                cursor.execute(f"INSERT INTO {table} (username, tele_name, user_id, zone_id, diamond_count, total_cost, order_ids, time, current_balance) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", (
+                    game_name_val, username, userid, zoneid,
+                    ", ".join([o['package'] for o in success_orders]),
+                    sum_price,
+                    ", ".join([o['order_id'] for o in success_orders]),
+                    timestamp, final_balance
+                ))
+                
+                if conn:
+                    if not is_admin:
+                        cursor.execute(f"UPDATE authorized_users SET {balance_column} = %s WHERE LOWER(username) = LOWER(%s)", (final_balance, username))
+                    else:
+                        cursor.execute(f"UPDATE admins SET {admin_balance_column} = %s WHERE (LOWER(username) = LOWER(%s) AND username IS NOT NULL AND username != '') OR admin_id = %s", (final_balance, username, str(user_id)))
+                    conn.commit()
+
+            if failed_orders:
+                error_msg = "\n".join(failed_orders)
+                if not msg_deleted:
+                    await processing_msg.edit_text(f"❌ Errors:\n{error_msg}")
+                    msg_deleted = True
+                else:
+                    await update.message.reply_text(f"❌ Errors:\n{error_msg}")
+
+    except Exception as e:
+        print(f"Error in recharge_mc: {e}")
+        if not msg_deleted:
+            await processing_msg.edit_text("❌ System error.")
+        else:
+            await update.message.reply_text("❌ System error.")
+    finally:
+        if conn:
+            conn.close()
+
+@restricted_to_pro_users
+async def recharge_mc_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await recharge_mc_generic(update, context, region="BR")
+
+@restricted_to_pro_users
+async def recharge_mc_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await recharge_mc_generic(update, context, region="PH")
+
 async def handle_dot_commands(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle commands starting with a dot (.)"""
     message_text = update.message.text
@@ -2427,7 +2832,6 @@ async def handle_dot_commands(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     # Check for .mk command
     if message_text.startswith('.mk '):
-        # Manually parse args for .mk
         args = message_text[4:].strip().split()
         context.args = args
         await recharge_br(update, context)
@@ -2435,10 +2839,23 @@ async def handle_dot_commands(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     # Check for .mkp command
     if message_text.startswith('.mkp '):
-        # Manually parse args for .mkp
         args = message_text[5:].strip().split()
         context.args = args
         await recharge_ph(update, context)
+        return
+
+    # Check for .mc command
+    if message_text.startswith('.mc '):
+        args = message_text[4:].strip().split()
+        context.args = args
+        await recharge_mc_br(update, context)
+        return
+
+    # Check for .mcp command
+    if message_text.startswith('.mcp '):
+        args = message_text[5:].strip().split()
+        context.args = args
+        await recharge_mc_ph(update, context)
         return
 
 def main():
@@ -2453,6 +2870,8 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("showph", show_products_ph))
     app.add_handler(CommandHandler("showbr", show_products_br))
+    app.add_handler(CommandHandler("showmc", show_products_mc_br))
+    app.add_handler(CommandHandler("showmcp", show_products_mc_ph))
     app.add_handler(CommandHandler("help", help_command))
     
     # Support both /mk and .mk
@@ -2460,9 +2879,13 @@ def main():
     
     # Support both /mkp and .mkp
     app.add_handler(CommandHandler("mkp", recharge_ph))
+
+    # Support /mc and /mcp
+    app.add_handler(CommandHandler("mc", recharge_mc_br))
+    app.add_handler(CommandHandler("mcp", recharge_mc_ph))
     
-    # Handler for dot commands (.mk, .mkp)
-    app.add_handler(MessageHandler(filters.Regex(r'^\.mk(p)?\s+'), handle_dot_commands))
+    # Handler for dot commands (.mk, .mkp, .mc, .mcp)
+    app.add_handler(MessageHandler(filters.Regex(r'^\.m[kc](p)?\s+'), handle_dot_commands))
     
     app.add_handler(CommandHandler("balance", check_balance))
     app.add_handler(CommandHandler("orph", view_history_ph))

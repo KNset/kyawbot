@@ -6,12 +6,14 @@ import json
 
 
 class SmileOneOrder:
-    def __init__(self, region=None):
+    def __init__(self, region=None, game_slug="mobilelegends"):
         self.cookie_file = "cookies.txt"
         if region == "BR":
             self.base_url = "https://www.smile.one"
         else:
             self.base_url = "https://www.smile.one/ph"
+        
+        self.game_slug = game_slug
         
         # Create session first
         self.session = requests.Session()
@@ -27,7 +29,7 @@ class SmileOneOrder:
         # Update session headers
         self.session.headers.update(self.common_headers)
         self.session.headers.update({
-            "Referer": f"{self.base_url}/merchant/mobilelegends",
+            "Referer": f"{self.base_url}/merchant/{self.game_slug}",
         })
 
     def load_cookies(self):
@@ -83,14 +85,14 @@ class SmileOneOrder:
         """
         Step 2 — Check role before querying order
         """
-        url = f"{self.base_url}/merchant/mobilelegends/checkrole"
+        url = f"{self.base_url}/merchant/{self.game_slug}/checkrole"
         
         headers = self.common_headers.copy()
         headers.update({
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
             "Accept": "application/json, text/javascript, */*; q=0.01",
             "Origin": self.base_url,
-            "Referer": f"{self.base_url}/merchant/mobilelegends?source=other",
+            "Referer": f"{self.base_url}/merchant/{self.game_slug}?source=other",
             "Sec-Fetch-Site": "same-origin",
             "Sec-Fetch-Mode": "cors",
             "Sec-Fetch-Dest": "empty",
@@ -122,7 +124,7 @@ class SmileOneOrder:
         """
         curl_cmd = [
             "curl", "-s", "-X", "POST",
-            f"{self.base_url}/merchant/mobilelegends/query",
+            f"{self.base_url}/merchant/{self.game_slug}/query",
             "-H", "Content-Type: application/x-www-form-urlencoded",
             "-d", f"user_id={user_id}&zone_id={zone_id}&pid={product_id}&checkrole=&pay_methond=smilecoin&channel_method=smilecoin"
         ]
@@ -165,7 +167,7 @@ class SmileOneOrder:
 
     # ---------- Step 4: Pay order (FIXED with x-redirect handling) ----------
     def step4_pay_order(self, flowid: str, user_id: str, zone_id: str, product_id: str):
-        url = f"{self.base_url}/merchant/mobilelegends/pay"
+        url = f"{self.base_url}/merchant/{self.game_slug}/pay"
 
         csrf_token = self.get_csrf()
         if not csrf_token:
@@ -176,7 +178,7 @@ class SmileOneOrder:
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Origin": self.base_url,
-            "Referer": f"{self.base_url}/merchant/mobilelegends",
+            "Referer": f"{self.base_url}/merchant/{self.game_slug}",
         })
 
         data = {
