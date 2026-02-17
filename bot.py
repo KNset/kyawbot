@@ -2235,10 +2235,10 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "• `gp` - Starlight Pass\n"
         "• `svp` - Super Value Pack\n\n"
         "💡 *Special Keywords (Magic Chess):*\n"
-        "• `gbb` - GoLukas's Battle Bounty\n"
-        "• `gbd` - GoBattle for Discounts\n"
-        "• `gpb` - GoPromotion Bounty\n"
-        "• `gwdp` - GoWeekly Diamond Pass\n\n"
+        "• `gbb` - Lukas's Battle Bounty\n"
+        "• `gbd` - Battle for Discounts\n"
+        "• `gpb` - Promotion Bounty\n"
+        "• `gwdp` - Weekly Diamond Pass\n\n"
         "Example: `/mk 12345678 1234 web`"
     )
     # conn.commit()
@@ -2660,10 +2660,10 @@ async def recharge_mc_generic(update: Update, context: ContextTypes.DEFAULT_TYPE
             
             # Magic Chess Package Mapping
             mc_keywords = {
-                'gbb': "GoLukas's Battle Bounty",
-                'gbd': "GoBattle for Discounts",
-                'gpb': "GoPromotion Bounty",
-                'gwdp': "GoWeekly Diamond Pass"
+                'gbb': "Lukas's Battle Bounty",
+                'gbd': "Battle for Discounts",
+                'gpb': "Promotion Bounty",
+                'gwdp': "Weekly Diamond Pass"
             }
             
             # Normalize input
