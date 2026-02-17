@@ -103,8 +103,8 @@ config = {
     #"TOKEN": "8457013411:AAEgmqenIS3rGou58tRayumTzDn5L0j_VL0", # madeinmyanmarBot
     #"TOKEN": "8336856493:AAHxGvE83jMQdPGwruGq47xhfFfcXxmzwEs", #renzy bot
 
-    #"TOKEN": "8237614023:AAFDETzY5tqXdFXmVO26fuOxHtVme2XxKto", #kyawbot
-    "TOKEN": "8382899337:AAHEOI6vK66CRfEUIggku5GE_GlbKCMQjEs", #Test Bot
+    "TOKEN": "8237614023:AAFDETzY5tqXdFXmVO26fuOxHtVme2XxKto", #kyawbot
+    #"TOKEN": "8382899337:AAHEOI6vK66CRfEUIggku5GE_GlbKCMQjEs", #Test Bot
     
     
     #"API_KEY": "22d687785ac420062a47842f83005d43",
@@ -2248,7 +2248,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 # --- Your Smile.One PHPSESSID (must be logged in already) ---
-SESSION_COOKIE = "mmres80rfmjpkg9k2pbk7pcjcm"  # Change this to your session cookie
+SESSION_COOKIE = "la1hbonrmfm2ahtp618qfk9frd"  # Change this to your session cookie
 
 # ----------------------------
 # SmileOne Activator Class
