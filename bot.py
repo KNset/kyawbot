@@ -103,8 +103,8 @@ config = {
     #"TOKEN": "8457013411:AAEgmqenIS3rGou58tRayumTzDn5L0j_VL0", # madeinmyanmarBot
     #"TOKEN": "8336856493:AAHxGvE83jMQdPGwruGq47xhfFfcXxmzwEs", #renzy bot
 
-    "TOKEN": "8237614023:AAFDETzY5tqXdFXmVO26fuOxHtVme2XxKto", #kyawbot
-    #"TOKEN": "8382899337:AAHEOI6vK66CRfEUIggku5GE_GlbKCMQjEs", #Test Bot
+    #"TOKEN": "8237614023:AAFDETzY5tqXdFXmVO26fuOxHtVme2XxKto", #kyawbot
+    "TOKEN": "8382899337:AAHEOI6vK66CRfEUIggku5GE_GlbKCMQjEs", #Test Bot
     
     
     #"API_KEY": "22d687785ac420062a47842f83005d43",
@@ -2651,9 +2651,12 @@ async def recharge_mc_generic(update: Update, context: ContextTypes.DEFAULT_TYPE
                 game_name_val = "Unknown"
 
             if game_name_val == "Not found" or game_name_val == "Error":
-                 # Maybe try anyway? Or fail?
-                 # If checkrole fails, user ID might be wrong.
-                 pass
+                 if not msg_deleted:
+                     await processing_msg.edit_text(f"❌ User not found.")
+                     msg_deleted = True
+                 else:
+                     await update.message.reply_text(f"❌ User not found.")
+                 continue
 
             # Determine product
             matched_product = None
@@ -2677,32 +2680,63 @@ async def recharge_mc_generic(update: Update, context: ContextTypes.DEFAULT_TYPE
                         matched_product = p
                         break
             else:
-                # Simple matching by amount or name
+                # Logic for splitting large diamond amounts
+                # If input is 1412, we want to split into 706 + 706
+                # This is a specific request for Magic Chess
+                target_amount = 0
                 try:
                     target_amount = int(diamond_input)
-                    for p in products:
-                        name = p.get('spu', '')
-                        # Try to extract exact diamond amount from name
-                        # Format usually: "Magic Chess: Go Go BR - diamond_55" or "55 Diamonds"
-                        # We use regex to find standalone numbers or numbers after underscore/space
-                        found_amount = 0
-                        # Try to parse "diamond_55" format
-                        import re
-                        match = re.search(r'diamond_(\d+)', name, re.IGNORECASE)
-                        if match:
-                             found_amount = int(match.group(1))
-                        else:
-                             # Fallback to existing extract function if available
-                             found_amount = extract_total_diamonds_br(name) if region == "BR" else extract_total_diamonds_ph(name)
-                        
-                        if found_amount == target_amount:
-                            matched_product = p
-                            break
                 except ValueError:
-                    for p in products:
-                        if diamond_input.lower() in p.get('spu', '').lower():
-                            matched_product = p
-                            break
+                    pass
+
+                # If target amount is 1412, we treat it as 2x 706
+                if target_amount == 1412:
+                     # Find product for 706
+                     product_706 = None
+                     for p in products:
+                         name = p.get('spu', '')
+                         import re
+                         match = re.search(r'diamond_(\d+)', name, re.IGNORECASE)
+                         if match and int(match.group(1)) == 706:
+                             product_706 = p
+                             break
+                     
+                     if product_706:
+                         # Modify loop behavior to order twice?
+                         # Or just set matched_product to 706 and multiply count by 2?
+                         matched_product = product_706
+                         count = count * 2 # Double the count
+                     else:
+                         # Fallback to normal search if 706 not found (unlikely)
+                         pass
+                
+                if not matched_product:
+                    # Simple matching by amount or name
+                    try:
+                        if target_amount == 0: target_amount = int(diamond_input)
+                        for p in products:
+                            name = p.get('spu', '')
+                            # Try to extract exact diamond amount from name
+                            # Format usually: "Magic Chess: Go Go BR - diamond_55" or "55 Diamonds"
+                            # We use regex to find standalone numbers or numbers after underscore/space
+                            found_amount = 0
+                            # Try to parse "diamond_55" format
+                            import re
+                            match = re.search(r'diamond_(\d+)', name, re.IGNORECASE)
+                            if match:
+                                found_amount = int(match.group(1))
+                            else:
+                                # Fallback to existing extract function if available
+                                found_amount = extract_total_diamonds_br(name) if region == "BR" else extract_total_diamonds_ph(name)
+                            
+                            if found_amount == target_amount:
+                                matched_product = p
+                                break
+                    except ValueError:
+                        for p in products:
+                            if diamond_input.lower() in p.get('spu', '').lower():
+                                matched_product = p
+                                break
             
             if not matched_product:
                 failed_orders.append(f"No product found for {diamond_input}")
@@ -2820,6 +2854,66 @@ async def recharge_mc_generic(update: Update, context: ContextTypes.DEFAULT_TYPE
         if conn:
             conn.close()
 
+from checkgameaccount import stalk_mlbb
+
+async def check_player_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Check MLBB player information using checkgameaccount.py"""
+    user_id = update.effective_user.id
+    
+    # Check if user provided arguments
+    if not context.args or len(context.args) < 2:
+        await update.message.reply_text("Usage: /checkID <userid> <zoneid>")
+        return
+
+    target_uid = context.args[0]
+    target_zone = context.args[1]
+    
+    status_msg = await update.message.reply_text("🔍 Checking player ID...")
+    
+    try:
+        # Run synchronous stalk_mlbb in executor
+        loop = asyncio.get_running_loop()
+        result = await loop.run_in_executor(None, stalk_mlbb, target_uid, target_zone)
+        
+        # Debug logging
+        print(f"Debug: stalk_mlbb result for {target_uid}({target_zone}): {result}")
+        
+        # Check for new response format: {'success': True, 'username': '...', 'region': '...'}
+        if result and isinstance(result, dict) and (result.get('success') is True or result.get('username')):
+            player_name = result.get('username')
+            region = result.get('region', 'Unknown')
+            
+            # Format the response
+            response_text = (
+                "✅ *Player Found*\n\n"
+                f"👤 *Username*: `{player_name}`\n"
+                f"📍 *Region*: `{region}`\n"
+                f"🆔 *ID*: `{target_uid}`\n"
+                f"🌍 *Zone*: `{target_zone}`"
+            )
+            await status_msg.edit_text(response_text, parse_mode='Markdown')
+        elif result and 'data' in result and 'username' in result['data']:
+            # Fallback for old format if any
+            player_name = result['data']['username']
+            response_text = (
+                "✅ *Player Found*\n\n"
+                f"👤 *IGN*: `{player_name}`\n"
+                f"🆔 *ID*: `{target_uid}`\n"
+                f"🌍 *Zone*: `{target_zone}`"
+            )
+            await status_msg.edit_text(response_text, parse_mode='Markdown')
+        else:
+             # Handle error cases
+            error_info = "Player not found or invalid ID/Zone."
+            if result and 'message' in result:
+                error_info = result['message']
+            
+            await status_msg.edit_text(f"❌ {error_info}")
+            
+    except Exception as e:
+        print(f"Error checking player ID: {e}")
+        await status_msg.edit_text("❌ An error occurred while checking player ID.")
+
 @restricted_to_pro_users
 async def recharge_mc_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await recharge_mc_generic(update, context, region="BR")
@@ -2894,7 +2988,7 @@ def main():
     app.add_handler(CommandHandler("balance", check_balance))
     app.add_handler(CommandHandler("orph", view_history_ph))
     app.add_handler(CommandHandler("orbr", view_history_br))
-    app.add_handler(CommandHandler("checkid", check_command))
+    app.add_handler(CommandHandler("checkid", check_player_id))
     app.add_handler(CommandHandler("myid", get_id))
     app.add_handler(CommandHandler("redeem", redeem))
 
