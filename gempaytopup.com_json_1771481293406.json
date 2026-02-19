@@ -1,0 +1,41 @@
+[
+  {
+    "domain": "gempaytopup.com",
+    "expirationDate": 1771488472.668065,
+    "hostOnly": true,
+    "httpOnly": false,
+    "name": "XSRF-TOKEN",
+    "path": "/",
+    "sameSite": "lax",
+    "secure": true,
+    "session": false,
+    "storeId": "0",
+    "value": "eyJpdiI6IjQ0OXQ0Q2hyaE11aThpczMzZUNnTlE9PSIsInZhbHVlIjoiYUVaQzJnS05VbUsvWlJDTlNrSHlIYnQ5UnZJdlRMeW5GZlZreVBycU0zRjhHNm8rOURYSzN2TWpjK3FZd0hBNzU5NEkvOStuT292VXZid2NOOE1iWHlkS2Z2eGlSTjBxUFdQa2FHa0FKUlJiWXU2RWhBZTgyQ1EzNEVHNVJFc0giLCJtYWMiOiIxZDM0Y2VkZTFkNzhjNDY1MzAzZDQ5N2ExMTFmMDI1NDJmYjhiYWRkNjBhYjVlYTU1YzQ4YjJmNjU1YzQ4MTMyIiwidGFnIjoiIn0%3D"
+  },
+  {
+    "domain": "gempaytopup.com",
+    "expirationDate": 1771488472.668434,
+    "hostOnly": true,
+    "httpOnly": true,
+    "name": "gempay_topup_session",
+    "path": "/",
+    "sameSite": "lax",
+    "secure": true,
+    "session": false,
+    "storeId": "0",
+    "value": "eyJpdiI6IkNkeWU1dVB4Wk5SQ3NCaFhncjltWWc9PSIsInZhbHVlIjoiSW50Zm82dnUrZm52aHp5elY2RUIwS2cweDZXb0NJWjVWanZKOHNycENRU05hTlBsYWlYaDVMK1J1bGlCYnpiejl4aVp1aXdHMUV4eEV3S0x2SER4TTVZYzhEaFRTZ2NwdFpoY1FxK2pHdGRVeVZPaUxhK1NubDhxV1N2V2ozRHkiLCJtYWMiOiJhMjc1MjcwNTIyMjUwMDZjYTM5NzBlNjQzNmQyNWIxNmI0NzI0ZDJjZGUzYzJjNDk4NmUyNWM1ZDlhNjBiYzlkIiwidGFnIjoiIn0%3D"
+  },
+  {
+    "domain": "gempaytopup.com",
+    "expirationDate": 1771567678,
+    "hostOnly": true,
+    "httpOnly": false,
+    "name": "popup",
+    "path": "/",
+    "sameSite": "unspecified",
+    "secure": false,
+    "session": false,
+    "storeId": "0",
+    "value": "0"
+  }
+]
