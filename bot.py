@@ -2748,7 +2748,7 @@ async def recharge_mc_generic(update: Update, context: ContextTypes.DEFAULT_TYPE
                     if region == "BR":
                         price_per_unit = (price_val - discount_val) * 10.0
                     else:
-                        price_per_unit = price_val
+                        price_per_unit = price_val - discount_val
                 except:
                     price_per_unit = 0.0
 
