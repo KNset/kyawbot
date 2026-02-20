@@ -20,13 +20,15 @@ class SmileOneBot:
         # Load cookies from file
         self._load_cookies_from_file(cookies_file)
         
+        base_url = "https://www.smile.one/br" if self.region != 'ph' else "https://www.smile.one/ph"
+        
         # Set up base headers
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36',
             'Accept': 'application/json, text/javascript, */*; q=0.01',
             'Accept-Language': 'en-GB,en;q=0.9',
             'Origin': 'https://www.smile.one',
-            'Referer': f'https://www.smile.one/merchant/game/magicchessgogo?source=other', # Maybe region specific?
+            'Referer': f'{base_url}/merchant/game/magicchessgogo?source=other', 
             'X-Requested-With': 'XMLHttpRequest',
             'Sec-Fetch-Site': 'same-origin',
             'Sec-Fetch-Mode': 'cors',
@@ -346,7 +348,8 @@ class SmileOneBot:
         """Step 5: Check messages (optional)"""
         print("\n📋 Step 5: Checking messages...")
         
-        url = "https://www.smile.one/message/message"
+        base_url = "https://www.smile.one/br" if self.region != 'ph' else "https://www.smile.one/ph"
+        url = f"{base_url}/message/message"
         
         headers = {
             'Upgrade-Insecure-Requests': '1',
