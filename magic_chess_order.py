@@ -127,7 +127,16 @@ class SmileOneBot:
         """Step 1: Check game role"""
         print("\n📋 Step 1: Checking game role...")
         
+        # NOTE: Updated URL to use /merchant/game/checkrole directly or /merchant/mobilelegends/checkrole?
+        # For Magic Chess, the product slug is 'magicchessgogo'
+        # The referer uses /merchant/game/magicchessgogo
+        # But the API endpoint might be different or require specific headers.
+        
         url = "https://www.smile.one/br/merchant/game/checkrole"
+        
+        # Ensure we have a valid CSRF token in params or body if needed
+        # SmileOne usually checks role via POST with product, uid, sid, checkrole=1
+        
         params = {"product": "magicchessgogo"}
         data = {
             "uid": self.uid,
@@ -137,6 +146,7 @@ class SmileOneBot:
         
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'Referer': 'https://www.smile.one/merchant/game/magicchessgogo?source=other'
         }
         
         try:
@@ -149,16 +159,26 @@ class SmileOneBot:
                     print(f"   Response: {json.dumps(result, indent=2)}")
                     
                     # Check if role exists
-                    if result.get('code') == 0 or result.get('status') == 'success':
+                    # API returns code: 200, info: "success" and nickname/username for valid user
+                    # If user invalid, it might return different code or info.
+                    # Based on log: "code": 200, "info": "success", "nickname": "Bert Melho&36"
+                    
+                    if result.get('code') == 200 and result.get('info') == 'success':
+                        username = result.get('nickname') or result.get('username', '')
+                        print(f"   ✅ Game role verified: {username}")
+                        return username if username else True
+                    elif result.get('code') == 0 or result.get('status') == 'success':
+                        # Fallback for old/other format
                         username = result.get('username', '')
                         print(f"   ✅ Game role verified: {username}")
                         return username if username else True
                     else:
-                        print("   ⚠️ Game role may not exist")
+                        print(f"   ⚠️ Game role may not exist: {result.get('message') or result.get('info')}")
+                        return False
                         
                 except:
                     print(f"   Response: {response.text[:100]}")
-                return False # Changed from True to False if json parsing fails or code != 0
+                    return False
             else:
                 print(f"❌ Role check failed (Status: {response.status_code})")
                 print(f"   Response: {response.text[:200]}")

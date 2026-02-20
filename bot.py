@@ -103,8 +103,8 @@ config = {
     #"TOKEN": "8457013411:AAEgmqenIS3rGou58tRayumTzDn5L0j_VL0", # madeinmyanmarBot
     #"TOKEN": "8336856493:AAHxGvE83jMQdPGwruGq47xhfFfcXxmzwEs", #renzy bot
 
-    "TOKEN": "8237614023:AAFDETzY5tqXdFXmVO26fuOxHtVme2XxKto", #kyawbot
-    #"TOKEN": "8382899337:AAHEOI6vK66CRfEUIggku5GE_GlbKCMQjEs", #Test Bot
+    #"TOKEN": "8237614023:AAFDETzY5tqXdFXmVO26fuOxHtVme2XxKto", #kyawbot
+    "TOKEN": "8382899337:AAHEOI6vK66CRfEUIggku5GE_GlbKCMQjEs", #Test Bot
     
     
     #"API_KEY": "22d687785ac420062a47842f83005d43",
@@ -2545,7 +2545,7 @@ async def gamename_mc(user_id, zone_id, region, product_id):
             # Use mg_cookies.txt as defined in SmileOneBot
             # Pass a dummy productid as it's not strictly needed for check_role in current implementation
             try:
-                bot = SmileOneBot(uid=str(user_id), sid=str(zone_id), productid="dummy") 
+                bot = SmileOneBot(uid=str(user_id), sid=str(zone_id), productid="dummy", cookies_file='mg_cookies.txt') 
                 role_result = bot.check_role()
                 if role_result:
                     # check_role now returns username string if successful, or True
@@ -2769,7 +2769,8 @@ async def recharge_mc_generic(update: Update, context: ContextTypes.DEFAULT_TYPE
                                     bot = SmileOneBot(
                                         uid=str(userid), 
                                         sid=str(zoneid), 
-                                        productid=str(matched_product['id'])
+                                        productid=str(matched_product['id']),
+                                        cookies_file='mg_cookies.txt'
                                     )
                                     return bot.run_full_flow()
                                 except SystemExit:
