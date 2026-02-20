@@ -6,13 +6,14 @@ import json
 import sys
 
 class SmileOneBot:
-    def __init__(self, cookies_file='cookies.txt', uid=None, sid=None, productid=None):
+    def __init__(self, cookies_file='cookies.txt', uid=None, sid=None, productid=None, region='BR'):
         self.session = requests.Session()
         
         # Store dynamic inputs
         self.uid = uid
         self.sid = sid
         self.productid = productid
+        self.region = region.lower() # 'br' or 'ph'
         self.csrf_token = None
         self.flowid = None
         
@@ -25,7 +26,7 @@ class SmileOneBot:
             'Accept': 'application/json, text/javascript, */*; q=0.01',
             'Accept-Language': 'en-GB,en;q=0.9',
             'Origin': 'https://www.smile.one',
-            'Referer': 'https://www.smile.one/merchant/game/magicchessgogo?source=other',
+            'Referer': f'https://www.smile.one/merchant/game/magicchessgogo?source=other', # Maybe region specific?
             'X-Requested-With': 'XMLHttpRequest',
             'Sec-Fetch-Site': 'same-origin',
             'Sec-Fetch-Mode': 'cors',
@@ -127,12 +128,10 @@ class SmileOneBot:
         """Step 1: Check game role"""
         print("\n📋 Step 1: Checking game role...")
         
-        # NOTE: Updated URL to use /merchant/game/checkrole directly or /merchant/mobilelegends/checkrole?
-        # For Magic Chess, the product slug is 'magicchessgogo'
-        # The referer uses /merchant/game/magicchessgogo
-        # But the API endpoint might be different or require specific headers.
-        
-        url = "https://www.smile.one/br/merchant/game/checkrole"
+        # Determine base URL based on region
+        # Default to BR, but support PH if region is set
+        base_url = "https://www.smile.one/br" if self.region != 'ph' else "https://www.smile.one/ph"
+        url = f"{base_url}/merchant/game/checkrole"
         
         # Ensure we have a valid CSRF token in params or body if needed
         # SmileOne usually checks role via POST with product, uid, sid, checkrole=1
@@ -146,7 +145,7 @@ class SmileOneBot:
         
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'Referer': 'https://www.smile.one/merchant/game/magicchessgogo?source=other'
+            'Referer': f'{base_url}/merchant/game/magicchessgogo?source=other'
         }
         
         try:
@@ -192,7 +191,8 @@ class SmileOneBot:
         """Step 2: Check customer"""
         print("\n📋 Step 2: Checking customer...")
         
-        url = "https://www.smile.one/merchant/customer"
+        base_url = "https://www.smile.one/br" if self.region != 'ph' else "https://www.smile.one/ph"
+        url = f"{base_url}/merchant/customer"
         data = {"check": "check"}
         
         headers = {
@@ -222,7 +222,8 @@ class SmileOneBot:
         """Step 3: Create order"""
         print("\n📋 Step 3: Creating order...")
         
-        url = "https://www.smile.one/br/merchant/game/createorder"
+        base_url = "https://www.smile.one/br" if self.region != 'ph' else "https://www.smile.one/ph"
+        url = f"{base_url}/merchant/game/createorder"
         params = {"product": "magicchessgogo"}
         data = {
             "uid": self.uid,
@@ -291,7 +292,8 @@ class SmileOneBot:
             'Sec-Fetch-Dest': 'document'
         }
         
-        url = "https://www.smile.one/merchant/game/pay"
+        base_url = "https://www.smile.one/br" if self.region != 'ph' else "https://www.smile.one/ph"
+        url = f"{base_url}/merchant/game/pay"
         
         # Prepare payment data
         payment_data = {

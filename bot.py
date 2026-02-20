@@ -2770,7 +2770,8 @@ async def recharge_mc_generic(update: Update, context: ContextTypes.DEFAULT_TYPE
                                         uid=str(userid), 
                                         sid=str(zoneid), 
                                         productid=str(matched_product['id']),
-                                        cookies_file='mg_cookies.txt'
+                                        cookies_file='mg_cookies.txt',
+                                        region=region
                                     )
                                     return bot.run_full_flow()
                                 except SystemExit:
