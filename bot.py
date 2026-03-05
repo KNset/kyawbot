@@ -1964,23 +1964,35 @@ async def add_admin_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text(f"⚠️ You don't have permission .")
 
-async def show_history_logic(update: Update, context: ContextTypes.DEFAULT_TYPE, region: str):
+async def show_history_logic(update: Update, context: ContextTypes.DEFAULT_TYPE, region: str, user_id_filter: str = None, zone_id_filter: str = None):
     username = update.effective_user.username
     table = "ph_order_history" if region == "PH" else "br_order_history"
     
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute(
-        f"SELECT * FROM {table} WHERE tele_name = %s ORDER BY id DESC LIMIT 10",
-        (username,)
-    )
+    
+    query = f"SELECT * FROM {table} WHERE tele_name = %s"
+    params = [username]
+    
+    if user_id_filter:
+        query += " AND user_id = %s"
+        params.append(user_id_filter)
+        
+    if zone_id_filter:
+        query += " AND zone_id = %s"
+        params.append(zone_id_filter)
+        
+    query += " ORDER BY id DESC LIMIT 10"
+    
+    cursor.execute(query, tuple(params))
     rows = cursor.fetchall()
     conn.close()
 
     target_messageable = update.callback_query.message if update.callback_query else update.message
 
     if not rows:
-        await target_messageable.reply_text(f"📭 No {region} order history found.")
+        filter_msg = f" for ID {user_id_filter}" if user_id_filter else ""
+        await target_messageable.reply_text(f"📭 No {region} order history found{filter_msg}.")
         return
 
     for row in rows:
@@ -1996,6 +2008,10 @@ async def show_history_logic(update: Update, context: ContextTypes.DEFAULT_TYPE,
         )
         await target_messageable.reply_text(summary, parse_mode="Markdown")
 
+# State for ConversationHandler (if we were using one, but simpler to use user_data)
+# We'll use user_data to store the state
+WAITING_FOR_HISTORY_ID = 1
+
 @restricted_to_pro_users
 async def history_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
@@ -2010,11 +2026,56 @@ async def history_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     
-    if query.data == 'hist_ph':
-        await show_history_logic(update, context, "PH")
-    elif query.data == 'hist_br':
-        await show_history_logic(update, context, "BR")
+    region = "PH" if query.data == 'hist_ph' else "BR"
+    
+    # Ask if they want to filter by ID
+    keyboard = [
+        [InlineKeyboardButton("🔍 Filter by Game ID", callback_data=f'filter_{region}')],
+        [InlineKeyboardButton("📜 Show All", callback_data=f'show_{region}')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await query.edit_message_text(f"Selected Region: {region}\nDo you want to filter by Game ID?", reply_markup=reply_markup)
 
+async def history_filter_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    
+    data = query.data
+    region = data.split('_')[1]
+    
+    if data.startswith('show_'):
+        await show_history_logic(update, context, region)
+    elif data.startswith('filter_'):
+        context.user_data['history_region'] = region
+        context.user_data['awaiting_history_id'] = True
+        await query.edit_message_text(f"Please enter the Game ID and Zone ID in format: `123456(1234)` or `123456 1234`", parse_mode='Markdown')
+
+async def handle_history_id_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not context.user_data.get('awaiting_history_id'):
+        return False # Not handling this message
+        
+    user_input = update.message.text
+    region = context.user_data.get('history_region')
+    
+    # Reset state
+    context.user_data['awaiting_history_id'] = False
+    context.user_data['history_region'] = None
+    
+    # Parse input
+    match = re.match(r'(\d+)\s*\(?(\d+)\)?', user_input)
+    if match:
+        user_id, zone_id = match.groups()
+        await show_history_logic(update, context, region, user_id, zone_id)
+    else:
+        await update.message.reply_text("❌ Invalid format. Please try /history again.")
+    
+    return True
+
+async def handle_history_id_input_wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Wrapper to check if we should handle the input"""
+    if context.user_data.get('awaiting_history_id'):
+        await handle_history_id_input(update, context)
+        
 @restricted_to_pro_users
 async def view_history_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await show_history_logic(update, context, "PH")
@@ -2988,6 +3049,12 @@ def main():
     app.add_handler(CommandHandler("balance", check_balance))
     app.add_handler(CommandHandler("history", history_command))
     app.add_handler(CallbackQueryHandler(history_callback, pattern='^hist_'))
+    app.add_handler(CallbackQueryHandler(history_filter_callback, pattern='^(show|filter)_'))
+    
+    # Message handler for capturing ID input (should be placed before other message handlers if generic, but here we check state inside)
+    # We can use a filter that runs the function if state is set, or just a general text handler that checks state
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_history_id_input_wrapper))
+    
     app.add_handler(CommandHandler("orph", view_history_ph))
     app.add_handler(CommandHandler("orbr", view_history_br))
     app.add_handler(CommandHandler("checkid", check_player_id))
