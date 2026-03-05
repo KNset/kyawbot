@@ -1964,25 +1964,28 @@ async def add_admin_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text(f"⚠️ You don't have permission .")
 
-@restricted_to_pro_users
-async def view_history_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def show_history_logic(update: Update, context: ContextTypes.DEFAULT_TYPE, region: str):
     username = update.effective_user.username
+    table = "ph_order_history" if region == "PH" else "br_order_history"
+    
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT * FROM ph_order_history WHERE tele_name = %s ORDER BY id DESC LIMIT 10",
+        f"SELECT * FROM {table} WHERE tele_name = %s ORDER BY id DESC LIMIT 10",
         (username,)
     )
     rows = cursor.fetchall()
+    conn.close()
+
+    target_messageable = update.callback_query.message if update.callback_query else update.message
 
     if not rows:
-        await update.message.reply_text("📭 No order history found.")
-        conn.close()
+        await target_messageable.reply_text(f"📭 No {region} order history found.")
         return
 
     for row in rows:
         summary = (
-            f"*📜 Last Order:*\n\n"
+            f"*📜 Last Order ({region}):*\n\n"
             f"UID: `{escape_markdown(str(row[3]), version=1)} ({escape_markdown(str(row[4]), version=1)})`\n"
             f"Name: {escape_markdown(str(row[1]), version=1)}\n"
             f"SN: `{escape_markdown(str(row[8]), version=1)}`\n"
@@ -1991,40 +1994,34 @@ async def view_history_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Paid SmileCoins: `{float(row[6]):.2f}`\n"
             f"Current SmileCoins: `{float(row[10]):.2f}`"
         )
-        await update.message.reply_text(summary, parse_mode="Markdown")
+        await target_messageable.reply_text(summary, parse_mode="Markdown")
 
-    conn.close()
+@restricted_to_pro_users
+async def history_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [InlineKeyboardButton("🇵🇭 PH History", callback_data='hist_ph'),
+         InlineKeyboardButton("🇧🇷 BR History", callback_data='hist_br')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_text("📜 Select Order History Region:", reply_markup=reply_markup)
+
+@restricted_to_pro_users
+async def history_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    
+    if query.data == 'hist_ph':
+        await show_history_logic(update, context, "PH")
+    elif query.data == 'hist_br':
+        await show_history_logic(update, context, "BR")
+
+@restricted_to_pro_users
+async def view_history_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await show_history_logic(update, context, "PH")
 
 @restricted_to_pro_users
 async def view_history_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    username = update.effective_user.username
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        "SELECT * FROM br_order_history WHERE tele_name = %s ORDER BY id DESC LIMIT 10",
-        (username,)
-    )
-    rows = cursor.fetchall()
-
-    if not rows:
-        await update.message.reply_text("📭 No order history found.")
-        conn.close()
-        return
-
-    for row in rows:
-        summary = (
-            f"*📜 Last Order:*\n\n"
-            f"UID: `{escape_markdown(str(row[3]), version=1)} ({escape_markdown(str(row[4]), version=1)})`\n"
-            f"Name: {escape_markdown(str(row[1]), version=1)}\n"
-            f"SN: `{escape_markdown(str(row[8]), version=1)}`\n"
-            f"Order: {escape_markdown(str(row[5]), version=1)}\n"
-            f"Time: `{escape_markdown(str(row[9]), version=1)}`\n"
-            f"Paid SmileCoins: `{float(row[6]):.2f}`\n"
-            f"Current SmileCoins: `{float(row[10]):.2f}`"
-        )
-        await update.message.reply_text(summary, parse_mode="Markdown")
-
-    conn.close()
+    await show_history_logic(update, context, "BR")
 
 
 
@@ -2219,6 +2216,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/mk  - 💎 Recharge MLBB (BR)\n"
         "/mcp - ♟️ Recharge Magic Chess (PH)\n"
         "/mc  - ♟️ Recharge Magic Chess (BR)\n"
+        "/history - 📜 View order history\n"
         "/orph - 📜 View order history (PH)\n"
         "/orbr - 📜 View order history (BR)\n"
         "/checkID - 📜 Player\n"
@@ -2988,6 +2986,8 @@ def main():
     app.add_handler(MessageHandler(filters.Regex(r'^\.m[kc](p)?\s+'), handle_dot_commands))
     
     app.add_handler(CommandHandler("balance", check_balance))
+    app.add_handler(CommandHandler("history", history_command))
+    app.add_handler(CallbackQueryHandler(history_callback, pattern='^hist_'))
     app.add_handler(CommandHandler("orph", view_history_ph))
     app.add_handler(CommandHandler("orbr", view_history_br))
     app.add_handler(CommandHandler("checkid", check_player_id))
