@@ -54,7 +54,7 @@ async def add_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     new_admin = context.args[0]
     new_adminid = str(context.args[1])
-    if adminid == '1278018722' or adminid == '1978808516':
+    if adminid == '1278018722' or adminid == '1780526188':
         try:
             add_user(new_admin, adminid)
         except Exception as e:
@@ -77,7 +77,7 @@ async def remove_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("Usage: /removeadmin <username>")
             return
         admin_to_remove = context.args[0]
-        if adminid == '1278018722' or adminid == '1978808516':
+        if adminid == '1278018722' or adminid == '1780526188':
             conn = get_connection()
             cursor = conn.cursor()
             cursor.execute("DELETE FROM admins WHERE username = %s", (admin_to_remove,))
@@ -103,7 +103,7 @@ config = {
     #"TOKEN": "8457013411:AAEgmqenIS3rGou58tRayumTzDn5L0j_VL0", # madeinmyanmarBot
     #"TOKEN": "8336856493:AAHxGvE83jMQdPGwruGq47xhfFfcXxmzwEs", #renzy bot
 
-    "TOKEN": "8237614023:AAFDETzY5tqXdFXmVO26fuOxHtVme2XxKto", #kyawbot
+    "TOKEN": "8794277466:AAF4Q2aYcQVUku_vg6asNZIFmna_Zim-COE", #kyawbot
     #"TOKEN": "8382899337:AAHEOI6vK66CRfEUIggku5GE_GlbKCMQjEs", #Test Bot
     
     
@@ -357,7 +357,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 @restricted_to_admin
 async def check_points_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-    if str(user_id) == '1278018722' or str(user_id) == '1978808516':
+    if str(user_id) == '1278018722' or str(user_id) == '1780526188':
         try:
             response = get_points_br()
             if response:
@@ -373,7 +373,7 @@ async def check_points_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
 @restricted_to_admin
 async def check_points_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-    if str(user_id) == '1278018722' or str(user_id) == '1978808516':
+    if str(user_id) == '1278018722' or str(user_id) == '1780526188':
         try:
             response = get_points_ph()
             if response:
@@ -1457,7 +1457,7 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
 @restricted_to_admin
 async def admin_help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     adminid = update.effective_user.id
-    if str(adminid) == '1278018722' or str(adminid) == '1978808516':
+    if str(adminid) == '1278018722' or str(adminid) == '1780526188':
         text = (
             "🆘 *Help Menu*\n\n"
             "/adduser - Start bot\n"
@@ -1593,7 +1593,7 @@ async def listadminusers(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         adminid = update.effective_user.id
-        if str(adminid) == '1278018722' or str(adminid) == '1978808516':
+        if str(adminid) == '1278018722' or str(adminid) == '1780526188':
             conn = get_connection()
             cursor = conn.cursor()
 
@@ -1681,7 +1681,7 @@ async def admin_check_balance(update: Update, context: ContextTypes.DEFAULT_TYPE
 async def add_smilecoin_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
     adid = update.effective_user.id
     adminid = str(adid)
-    if adminid in ('1278018722', '1978808516'):
+    if adminid in ('1278018722', '1780526188'):
         if len(context.args) != 2:
             await update.message.reply_text("Usage: /addcoinbr <username> <amount>")
             return
@@ -1777,7 +1777,7 @@ async def add_smilecoin_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def add_smilecoin_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
     adid = update.effective_user.id
     adminid = str(adid)
-    if adminid in ('1278018722', '1978808516'):
+    if adminid in ('1278018722', '1780526188'):
         if len(context.args) != 2:
             await update.message.reply_text("Usage: /addcoinph <username> <amount>")
             return
@@ -1874,7 +1874,7 @@ async def add_smilecoin_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def add_admin_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
     adid = update.effective_user.id
     adminid = str(adid)
-    if adminid in ('1278018722', '1978808516'):
+    if adminid in ('1278018722', '1780526188'):
         if len(context.args) != 2:
             await update.message.reply_text("Usage: /addcoinphtoadmin <username> <amount>")
             return
@@ -1922,7 +1922,7 @@ async def add_admin_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def add_admin_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
     adid = update.effective_user.id
     adminid = str(adid)
-    if adminid in ('1278018722', '1978808516'):
+    if adminid in ('1278018722', '1780526188'):
         if len(context.args) != 2:
             await update.message.reply_text("Usage: /addcoinbrtoadmin <username> <amount>")
             return
@@ -2307,7 +2307,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 # --- Your Smile.One PHPSESSID (must be logged in already) ---
-SESSION_COOKIE = "ik1ghp6hb9ok7u2cn12310r9s8"  # Change this to your session cookie
+SESSION_COOKIE = "sk0q0ttdcot4l2o22mef4fttok"  # Change this to your session cookie
 
 # ----------------------------
 # SmileOne Activator Class
