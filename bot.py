@@ -54,7 +54,7 @@ async def add_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     new_admin = context.args[0]
     new_adminid = str(context.args[1])
-    if adminid == '1278018722' or adminid == '1780526188':
+    if adminid == '1278018722' or adminid == '8269122380':
         try:
             add_user(new_admin, adminid)
         except Exception as e:
@@ -77,7 +77,7 @@ async def remove_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("Usage: /removeadmin <username>")
             return
         admin_to_remove = context.args[0]
-        if adminid == '1278018722' or adminid == '1780526188':
+        if adminid == '1278018722' or adminid == '8269122380':
             conn = get_connection()
             cursor = conn.cursor()
             cursor.execute("DELETE FROM admins WHERE username = %s", (admin_to_remove,))
@@ -357,7 +357,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 @restricted_to_admin
 async def check_points_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-    if str(user_id) == '1278018722' or str(user_id) == '1780526188':
+    if str(user_id) == '1278018722' or str(user_id) == '8269122380':
         try:
             response = get_points_br()
             if response:
@@ -373,7 +373,7 @@ async def check_points_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
 @restricted_to_admin
 async def check_points_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-    if str(user_id) == '1278018722' or str(user_id) == '1780526188':
+    if str(user_id) == '1278018722' or str(user_id) == '8269122380':
         try:
             response = get_points_ph()
             if response:
@@ -1464,7 +1464,7 @@ async def recharge_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
 @restricted_to_admin
 async def admin_help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     adminid = update.effective_user.id
-    if str(adminid) == '1278018722' or str(adminid) == '1780526188':
+    if str(adminid) == '1278018722' or str(adminid) == '8269122380':
         text = (
             "🆘 *Help Menu*\n\n"
             "/adduser - Start bot\n"
@@ -1600,7 +1600,7 @@ async def listadminusers(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         adminid = update.effective_user.id
-        if str(adminid) == '1278018722' or str(adminid) == '1780526188':
+        if str(adminid) == '1278018722' or str(adminid) == '8269122380':
             conn = get_connection()
             cursor = conn.cursor()
 
@@ -1688,7 +1688,7 @@ async def admin_check_balance(update: Update, context: ContextTypes.DEFAULT_TYPE
 async def add_smilecoin_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
     adid = update.effective_user.id
     adminid = str(adid)
-    if adminid in ('1278018722', '1780526188'):
+    if adminid in ('1278018722', '8269122380'):
         if len(context.args) != 2:
             await update.message.reply_text("Usage: /addcoinbr <username> <amount>")
             return
@@ -1784,7 +1784,7 @@ async def add_smilecoin_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def add_smilecoin_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
     adid = update.effective_user.id
     adminid = str(adid)
-    if adminid in ('1278018722', '1780526188'):
+    if adminid in ('1278018722', '8269122380'):
         if len(context.args) != 2:
             await update.message.reply_text("Usage: /addcoinph <username> <amount>")
             return
@@ -1881,7 +1881,7 @@ async def add_smilecoin_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def add_admin_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
     adid = update.effective_user.id
     adminid = str(adid)
-    if adminid in ('1278018722', '1780526188'):
+    if adminid in ('1278018722', '8269122380'):
         if len(context.args) != 2:
             await update.message.reply_text("Usage: /addcoinphtoadmin <username> <amount>")
             return
@@ -1929,7 +1929,7 @@ async def add_admin_ph(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def add_admin_br(update: Update, context: ContextTypes.DEFAULT_TYPE):
     adid = update.effective_user.id
     adminid = str(adid)
-    if adminid in ('1278018722', '1780526188'):
+    if adminid in ('1278018722', '8269122380'):
         if len(context.args) != 2:
             await update.message.reply_text("Usage: /addcoinbrtoadmin <username> <amount>")
             return
