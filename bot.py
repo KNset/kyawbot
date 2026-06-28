@@ -2314,7 +2314,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 # --- Your Smile.One PHPSESSID (must be logged in already) ---
-SESSION_COOKIE = "k7stdkfju24vs7di090pvh9d71"  # Change this to your session cookie
+SESSION_COOKIE = "jcr1ikrdd00c04d4udv5l9skm4"  # Change this to your session cookie
 
 # ----------------------------
 # SmileOne Activator Class
