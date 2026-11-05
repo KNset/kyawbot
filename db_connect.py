@@ -4,7 +4,7 @@ import psycopg2
 def get_connection():
     try:
         conn = psycopg2.connect(
-            dbname="bot_data",
+            dbname="joetestdb",
             user="postgres",
             password="1001",  
             host="localhost",
