@@ -7,7 +7,7 @@ def get_connection():
             dbname="bot_data",
             user="postgres",
             password="1001",  
-            host="72.60.107.248",
+            host="localhost",
             port="5432"
         )
         #conn = psycopg2.connect('postgres://koyeb-adm:npg_P79ROmhtSYdi@ep-misty-sunset-a1xbkiwi.ap-southeast-1.pg.koyeb.app/koyebdb')
