@@ -8,7 +8,7 @@ def get_connection():
             user="postgres",
             password="1001",  
             host="localhost",
-            port="5432"
+            port="5434"
         )
         #conn = psycopg2.connect('postgres://koyeb-adm:npg_P79ROmhtSYdi@ep-misty-sunset-a1xbkiwi.ap-southeast-1.pg.koyeb.app/koyebdb')
         #conn = psycopg2.connect('postgresql://postgres:y7db844eUVmTO4yw@db.xdeewemctoqpcjlrdnkk.supabase.co:5432/postgres')
